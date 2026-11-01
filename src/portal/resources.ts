@@ -202,12 +202,13 @@ function absoluteLink(href: string, base: string): string | null {
  */
 export function parseResourceIndex(html: string): ResourceIndex {
   const categories: ResourceCategory[] = [];
+  const close = divCloseIndex(html);
   const blockOpenRe = /<div[^>]*class="[^"]*\bcol-sm-6\b[^"]*"[^>]*>/gi;
   let open: RegExpExecArray | null;
   while ((open = blockOpenRe.exec(html)) !== null) {
     // Depth-scanned: a `<div>` nested inside the block no longer truncates
     // the capture (and with it the previews, id, and More link).
-    const inner = captureDivAt(html, open.index);
+    const inner = captureDivAt(html, open.index, close);
     if (inner === null) {
       warn("skipping resource block with unbalanced markup");
       continue;
@@ -307,13 +308,14 @@ export function parseResourceCategory(html: string, sectionId: number): Resource
   const name = crumbNames.length === 0 ? null : (crumbNames[crumbNames.length - 1] ?? null);
 
   const groups: CategoryGroup[] = [];
+  const close = divCloseIndex(html);
   const boundaryOpenRe = /<div[^>]*class="[^"]*\bibox-title\b[^"]*"[^>]*>/gi;
   const boundaries: { index: number; name: string | null }[] = [];
   let boundaryOpen: RegExpExecArray | null;
   while ((boundaryOpen = boundaryOpenRe.exec(html)) !== null) {
     // Depth-scanned like everything else: nested markup inside the title
     // cannot cut the `h4` lookup short.
-    const inner = captureDivAt(html, boundaryOpen.index);
+    const inner = captureDivAt(html, boundaryOpen.index, close);
     boundaries.push({
       index: boundaryOpen.index,
       name: inner === null ? null : textCell(/<h4[^>]*>([\s\S]*?)<\/h4>/i.exec(inner)?.[1]),
@@ -341,7 +343,7 @@ export function parseResourceCategory(html: string, sectionId: number): Resource
     if (!current) current = { name: null, items: [] };
     // Depth-scanned: a `<div>` nested inside the row no longer truncates the
     // capture (and with it the `<small>` description).
-    const inner = captureDivAt(html, rowOpen.index);
+    const inner = captureDivAt(html, rowOpen.index, close);
     if (inner === null) {
       warn("skipping resource row with unbalanced markup");
       continue;
@@ -405,12 +407,46 @@ export async function fetchResourceCategory(
  * Returns null when unbalanced or when nothing opens at `index` — fail
  * closed, never hang. A `<div>` nested inside the capture no longer
  * truncates it, unlike a lazy `([\s\S]*?)<\/div>` match.
+ *
+ * When `close` (from {@link divCloseIndex}) is provided, the matching close
+ * is looked up in O(1) instead of rescanning the document — the three
+ * per-match loops pass the index while `extractBodyContainer` (one call per
+ * article) keeps the direct scan.
  */
-function captureDivAt(html: string, index: number): string | null {
+function captureDivAt(html: string, index: number, close?: Map<number, number>): string | null {
   const open = /^<div\b[^>]*>/i.exec(html.slice(index));
   if (!open) return null;
+  if (close !== undefined) {
+    const end = close.get(index);
+    return end === undefined ? null : html.slice(index + open[0].length, end);
+  }
   const end = scanToClose(html, index + open[0].length, 1);
   return end === null ? null : html.slice(index + open[0].length, end);
+}
+
+/**
+ * One-pass index of matching div closes: `close.get(openOffset)` is the
+ * offset of the `</div>` that closes the `<div` opening at `openOffset`.
+ * Same token walk as {@link scanToClose} (comments and script/style blocks
+ * skipped as units) so lookups agree byte-for-byte with the direct scan;
+ * unbalanced openers simply have no entry.
+ */
+function divCloseIndex(html: string): Map<number, number> {
+  const close = new Map<number, number>();
+  const tokenRe = /<!--[\s\S]*?-->|<(script|style)\b[^>]*>[\s\S]*?<\/\1\s*>|<\/?div\b[^>]*>/gi;
+  const stack: number[] = [];
+  let match: RegExpExecArray | null;
+  while ((match = tokenRe.exec(html)) !== null) {
+    const token = match[0];
+    if (/^<!--|^<(script|style)\b/i.test(token)) continue;
+    if (token[1] === "/") {
+      const openOffset = stack.pop();
+      if (openOffset !== undefined) close.set(openOffset, match.index);
+    } else {
+      stack.push(match.index);
+    }
+  }
+  return close;
 }
 
 function extractBodyContainer(html: string): string | null {

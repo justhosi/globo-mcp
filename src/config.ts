@@ -18,6 +18,9 @@ export interface GloboConfig {
 
 export const DEFAULT_BASE_URL = "https://globohq.com";
 
+/** Cookie-octet per RFC 6265: printable ASCII minus `"`, `,`, `;`, `\` and space. */
+const COOKIE_OCTET = /^[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]+$/;
+
 /**
  * True when `value` is a usable IANA timezone name. Used to fail fast on a
  * bad `GLOBO_TIMEZONE` and to vet the profile's timezone before handing it
@@ -55,6 +58,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): GloboConfig {
   }
   const password = passwordRaw === "" ? undefined : passwordRaw;
   const sessionCookie = sessionCookieRaw === "" ? undefined : sessionCookieRaw;
+  if (sessionCookie !== undefined && !COOKIE_OCTET.test(sessionCookie)) {
+    throw new Error(
+      "Invalid GLOBO_SESSION_COOKIE: it must be one line of printable ASCII with no spaces, control characters or non-ASCII characters. Copy the _globo-portal_session value again and paste it without a line break.",
+    );
+  }
   if (password === undefined && sessionCookie === undefined) {
     throw new Error(
       "Missing credentials. Set GLOBO_PASSWORD, or set GLOBO_SESSION_COOKIE to the raw " +
@@ -66,12 +74,17 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): GloboConfig {
     parsed = new URL(baseUrl);
   } catch {
     throw new Error(
-      `Invalid GLOBO_BASE_URL ${JSON.stringify(baseUrl)}. It must be an absolute URL such as https://globohq.com.`,
+      "Invalid GLOBO_BASE_URL. It must be an absolute URL such as https://globohq.com.",
+    );
+  }
+  if (parsed.username !== "" || parsed.password !== "") {
+    throw new Error(
+      "Invalid GLOBO_BASE_URL. It must not include credentials (username or password) — use https://globohq.com.",
     );
   }
   if (parsed.protocol !== "https:") {
     throw new Error(
-      `Invalid GLOBO_BASE_URL ${JSON.stringify(baseUrl)}. It must use https:// — ` +
+      "Invalid GLOBO_BASE_URL. It must use https:// — " +
         "the session cookie would travel in cleartext over http://.",
     );
   }

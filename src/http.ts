@@ -132,10 +132,43 @@ export function isLoggedOutRedirect(location: string | null): boolean {
 /**
  * True when a 200 HTML body is actually the logged-out interstitial: a form
  * whose id or action contains `omniauth/auth0`.
+ *
+ * Bounded and linear: only the first 512 KiB of the body are scanned, each
+ * `<form` opener is inspected only up to its closing `>` (bounded by 4 KiB)
+ * via a small quote-anchored match (no `[^>]*` span, so no quadratic
+ * backtracking), and the scan advances with `indexOf` — never a global regex
+ * over the body. Search and slicing both run on the same lowercased copy so
+ * offsets always agree (`String#toLowerCase` can change length, e.g. U+0130;
+ * the field match itself is case-insensitive).
+ *
+ * Known verdict difference (accepted): a form tag longer than 4 KiB is not
+ * examined.
  */
+const MAX_LOGIN_SCAN_CHARS = 512 * 1024;
+const MAX_LOGIN_TAG_CHARS = 4096;
+const LOGIN_FORM_FIELDS = /(?:id|action)="[^"]*omniauth\/auth0/i;
 export function isLoginPageBody(text: string, contentType: string | null): boolean {
   if (!contentType || !contentType.toLowerCase().includes("text/html")) return false;
-  return /<(form)[^>]*(id|action)="[^"]*omniauth\/auth0[^"]*"/i.test(text);
+  const window = text.length > MAX_LOGIN_SCAN_CHARS ? text.slice(0, MAX_LOGIN_SCAN_CHARS) : text;
+  const lower = window.toLowerCase();
+  let at = lower.indexOf("<form");
+  // Offset of the first ">" at or after the previous opener; monotonic, so
+  // the ">" scan is a single forward pass (never restarted per opener).
+  let gt = -1;
+  while (at !== -1) {
+    if (gt < at) {
+      gt = lower.indexOf(">", at);
+      // No ">" left in the window: no later opener can close either.
+      if (gt === -1) return false;
+    }
+    if (gt - at + 1 > MAX_LOGIN_TAG_CHARS) {
+      at = lower.indexOf("<form", at + 5);
+      continue;
+    }
+    if (LOGIN_FORM_FIELDS.test(lower.slice(at, gt + 1))) return true;
+    at = lower.indexOf("<form", at + 5);
+  }
+  return false;
 }
 
 export function isRedirect(status: number): boolean {
@@ -153,6 +186,20 @@ export function formatBudget(timeoutMs: number): string {
  */
 export function cancelledError(): Error {
   return new Error("The request was cancelled before the portal responded.");
+}
+
+/**
+ * Set the Cookie header, mapping any invalid-value throw to a fixed,
+ * cookie-free message (the value must never surface in tool output).
+ */
+export function setCookieHeader(headers: Headers, cookie: string): void {
+  try {
+    headers.set("Cookie", cookie);
+  } catch {
+    throw new Error(
+      "The stored session cookie value is not a valid HTTP header value. Set GLOBO_SESSION_COOKIE again from a fresh browser session.",
+    );
+  }
 }
 
 /** Cookie-aware fetch client bound to one portal base URL. */
@@ -234,7 +281,7 @@ export class HttpClient {
       const headers = new Headers(extraHeaders);
       headers.set("User-Agent", "globo-mcp/0.1.0");
       const cookie = this.jar.headerFor(currentUrl);
-      if (cookie) headers.set("Cookie", cookie);
+      if (cookie) setCookieHeader(headers, cookie);
 
       const response = await this.timedFetch(currentUrl, {
         ...init,
@@ -303,7 +350,7 @@ export class HttpClient {
     const headers = new Headers(init.headers);
     headers.set("User-Agent", "globo-mcp/0.1.0");
     const cookie = this.jar.headerFor(url);
-    if (cookie) headers.set("Cookie", cookie);
+    if (cookie) setCookieHeader(headers, cookie);
 
     const response = await this.timedFetch(url, { ...init, headers, redirect: "manual" });
     this.jar.storeFromResponse(response, url);
