@@ -19,6 +19,20 @@ export interface GloboConfig {
 export const DEFAULT_BASE_URL = "https://globohq.com";
 
 /**
+ * True when `value` is a usable IANA timezone name. Used to fail fast on a
+ * bad `GLOBO_TIMEZONE` and to vet the profile's timezone before handing it
+ * to `Intl` (a bad portal value must not surface as a bare RangeError).
+ */
+export function isValidTimezone(value: string): boolean {
+  try {
+    new Intl.DateTimeFormat(undefined, { timeZone: value });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Read and validate configuration from environment variables.
  *
  * @param env Environment mapping to read (defaults to `process.env`).
@@ -62,11 +76,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): GloboConfig {
     );
   }
   if (timezone !== undefined) {
-    try {
-      // Validates the IANA name now so a typo fails fast here instead of as
-      // a bare RangeError from Intl deep inside a tool call.
-      new Intl.DateTimeFormat(undefined, { timeZone: timezone });
-    } catch {
+    // A typo fails fast here instead of as a bare RangeError from Intl deep
+    // inside a tool call.
+    if (!isValidTimezone(timezone)) {
       throw new Error(
         `Invalid GLOBO_TIMEZONE ${JSON.stringify(timezone)}. It must be a valid IANA timezone name such as Europe/Istanbul.`,
       );

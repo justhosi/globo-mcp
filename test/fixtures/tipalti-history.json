@@ -1,0 +1,61 @@
+{
+  "totalNumberOfPayments": 6,
+  "payeePaymentHistoryIFrameModels": [
+    {
+      "status": "Paid",
+      "paymentMethod": "Direct Deposit / ACH",
+      "displayedAmountSubmitted": "USD 99.50",
+      "displayedDate": "Oct 27, 2026",
+      "poId": 910003,
+      "canDownloadPaymentDetailsReport": true,
+      "payerEntityName": "GLOBO"
+    },
+    {
+      "status": "Rejected",
+      "paymentMethod": "Wire Transfer",
+      "displayedAmountSubmitted": "EUR 250.00",
+      "displayedDate": "Sep 15, 2026",
+      "poId": 910002,
+      "canDownloadPaymentDetailsReport": false,
+      "payerEntityName": "GLOBO"
+    },
+    {
+      "status": "Paid",
+      "paymentMethod": "Direct Deposit / ACH",
+      "displayedAmountSubmitted": "USD 3,141.59",
+      "displayedDate": "Oct 27, 2026",
+      "poId": 910001,
+      "canDownloadPaymentDetailsReport": true,
+      "payerEntityName": "GLOBO"
+    },
+    {
+      "status": "Paid",
+      "paymentMethod": "Check",
+      "displayedAmountSubmitted": "EUR 1,200.00",
+      "displayedDate": "Aug 2, 2026",
+      "poId": 910004,
+      "canDownloadPaymentDetailsReport": true,
+      "payerEntityName": "Example Payer"
+    },
+    {
+      "status": "Paid",
+      "paymentMethod": "Direct Deposit / ACH",
+      "displayedAmountSubmitted": "lots of money",
+      "displayedDate": "Jul 4, 2026",
+      "poId": 910005,
+      "canDownloadPaymentDetailsReport": false,
+      "payerEntityName": "GLOBO"
+    },
+    {
+      "status": "Paid",
+      "paymentMethod": "Direct Deposit / ACH",
+      "displayedAmountSubmitted": "USD 10.00",
+      "displayedDate": "someday",
+      "poId": 910006,
+      "canDownloadPaymentDetailsReport": false,
+      "payerEntityName": "GLOBO"
+    }
+  ],
+  "hasMultiplePayerEntities": false,
+  "isDisplayApprovalDateEnabled": false
+}

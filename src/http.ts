@@ -12,6 +12,12 @@ const MAX_REDIRECTS = 10;
 /** Host of the Auth0 tenant the portal delegates sign-in to. */
 export const AUTH_HOST = "auth.globohq.cloud";
 /**
+ * Host of the Tipalti payee dashboard serving payout history. Allowlisted
+ * explicitly: every other non-portal host stays refused by the redirect
+ * clamp below.
+ */
+export const TIPALT_HOST = "ui2.tipalti.com";
+/**
  * Default per-request timeout. One hung connection must never block every
  * tool (a single-flight login waits on it), so each hop gets its own budget.
  */
@@ -101,6 +107,20 @@ export function isPortalOrAuthUrl(url: string, baseUrl: string): boolean {
 }
 
 /**
+ * True when a URL stays on the Tipalti dashboard/API origin. Origins (not
+ * bare hostnames) are compared so a non-default port counts as a different
+ * target — same rule as `isPortalOrAuthUrl`. Used by the payments tool to
+ * gate the iframe URL and every redirect hop.
+ */
+export function isTipaltiUrl(url: string): boolean {
+  try {
+    return new URL(url).origin === `https://${TIPALT_HOST}`;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * True when a redirect Location points at the Auth0 tenant, which means the
  * portal considers us logged out.
  */
@@ -118,13 +138,21 @@ export function isLoginPageBody(text: string, contentType: string | null): boole
   return /<(form)[^>]*(id|action)="[^"]*omniauth\/auth0[^"]*"/i.test(text);
 }
 
-function isRedirect(status: number): boolean {
+export function isRedirect(status: number): boolean {
   return status === 301 || status === 302 || status === 303 || status === 307 || status === 308;
 }
 
 /** Human-scale budget for timeout errors (`30000` → `"30s"`, `300` → `"300ms"`). */
-function formatBudget(timeoutMs: number): string {
+export function formatBudget(timeoutMs: number): string {
   return timeoutMs < 1000 ? `${timeoutMs}ms` : `${Math.round(timeoutMs / 1000)}s`;
+}
+
+/**
+ * Distinct error for caller-initiated cancellation: the caller hung up, so
+ * this is never reported as a portal timeout.
+ */
+export function cancelledError(): Error {
+  return new Error("The request was cancelled before the portal responded.");
 }
 
 /** Cookie-aware fetch client bound to one portal base URL. */
@@ -139,8 +167,9 @@ export class HttpClient {
   /**
    * One `fetch` with the client timeout (fresh budget per redirect hop and
    * per login step). A caller-supplied `signal` is composed with the timeout
-   * so neither is silently discarded. An abort becomes a clear error naming
-   * the wait; anything else propagates untouched.
+   * so neither is silently discarded. A caller abort becomes a cancellation
+   * error; an expired budget becomes a timeout error naming the wait;
+   * anything else propagates untouched.
    */
   private async timedFetch(url: string, init: RequestInit): Promise<Response> {
     const timeout = AbortSignal.timeout(this.timeoutMs);
@@ -152,10 +181,39 @@ export class HttpClient {
         error instanceof DOMException &&
         (error.name === "AbortError" || error.name === "TimeoutError")
       ) {
-        throw new Error(
-          `The portal did not respond within ${formatBudget(this.timeoutMs)}. ` +
-            "The portal may be down or slow — try again later.",
-        );
+        if (init.signal?.aborted) throw cancelledError();
+        throw this.timeoutError();
+      }
+      throw error;
+    }
+  }
+
+  /** Timeout error for this client's budget. */
+  private timeoutError(): Error {
+    return new Error(
+      `The portal did not respond within ${formatBudget(this.timeoutMs)}. ` +
+        "The portal may be down or slow — try again later.",
+    );
+  }
+
+  /**
+   * Read a response body, mapping an abort during the read to the same
+   * outcome as a hung connection: headers arriving is no guarantee the body
+   * will. A caller abort stays a cancellation error.
+   */
+  private async readBodyText(
+    response: Response,
+    callerSignal?: AbortSignal | null,
+  ): Promise<string> {
+    try {
+      return await response.text();
+    } catch (error) {
+      if (
+        error instanceof DOMException &&
+        (error.name === "AbortError" || error.name === "TimeoutError")
+      ) {
+        if (callerSignal?.aborted) throw cancelledError();
+        throw this.timeoutError();
       }
       throw error;
     }
@@ -229,7 +287,7 @@ export class HttpClient {
         continue;
       }
 
-      const text = await response.text();
+      const text = await this.readBodyText(response, init.signal ?? null);
       return { status: response.status, headers: response.headers, text, url: currentUrl };
     }
 
@@ -252,7 +310,9 @@ export class HttpClient {
     // Redirect bodies are discarded; callers read the target from the
     // `location` response header.
     const text =
-      isRedirect(response.status) || response.status === 204 ? "" : await response.text();
+      isRedirect(response.status) || response.status === 204
+        ? ""
+        : await this.readBodyText(response, init.signal ?? null);
     return { status: response.status, headers: response.headers, text, url };
   }
 

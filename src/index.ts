@@ -25,6 +25,7 @@ import { TtlCache } from "./portal/cache.js";
 import { fetchMonthlyMinutes } from "./portal/monthly.js";
 import { fetchScheduledCalls, listScheduledCalls } from "./portal/scheduled.js";
 import { fetchAssignments, listAssignments } from "./portal/assignments.js";
+import { fetchPayments, listPayments } from "./portal/payments.js";
 import { getAccountTimezone } from "./portal/timezone.js";
 import { getProfile } from "./portal/profile.js";
 import { checkPaging } from "./paging.js";
@@ -317,6 +318,48 @@ async function main(): Promise<void> {
           ),
           timezone: timezone ?? "UTC",
         };
+      }),
+  );
+
+  server.registerTool(
+    "globo_payments",
+    {
+      title: "Payments",
+      description:
+        "Show payout history from Tipalti, the portal's payout provider (the portal's own payments page is empty for Tipalti accounts): payment date, amount and currency, status, method, and payer, as Tipalti displays them. Filter by date range, status or currency (case-insensitive exact match); results are paginated with per-currency and per-status totals. For worked-call history use globo_list_calls.",
+      inputSchema: z.object({
+        ...dateRangeShape,
+        status: z
+          .string()
+          .optional()
+          .describe(
+            "Keep payouts with this status (case-insensitive exact match: paid, rejected). Unknown values match nothing.",
+          ),
+        currency: z
+          .string()
+          .optional()
+          .describe("Keep payouts in this currency (case-insensitive exact match: usd, eur)."),
+        limit: z.number().int().default(50).describe("Max rows to return (max 1000)."),
+        offset: z.number().int().default(0).describe("Rows to skip before returning."),
+      }),
+      annotations: { readOnlyHint: true },
+    },
+    async ({ start, end, status, currency, limit, offset }) =>
+      runTool(async () => {
+        const { startParts, endParts } = parseRange(start, end);
+        checkPaging(limit, offset);
+        const rows = await fetchPayments(auth, cache);
+        return listPayments(
+          rows,
+          {
+            start: startParts,
+            end: endParts,
+            status: status?.toLowerCase(),
+            currency: currency?.toLowerCase(),
+          },
+          limit,
+          offset,
+        );
       }),
   );
 

@@ -334,6 +334,20 @@ describe("HttpClient redirect policy", () => {
     expect(captured?.aborted).toBe(false);
     await expect(
       client.requestOnce("https://globohq.com/x", { signal: AbortSignal.abort() }),
-    ).rejects.toThrow(/did not respond within 30s/);
+    ).rejects.toThrow(/cancelled before the portal responded/);
+  });
+
+  it("maps a stalled body read to the timeout error", async () => {
+    const client = new HttpClient("https://globohq.com", 30_000);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        const response = new Response("partial", { status: 200 });
+        response.text = () =>
+          Promise.reject(new DOMException("Body stalled mid-read.", "TimeoutError"));
+        return response;
+      }),
+    );
+    await expect(client.get("/users/edit")).rejects.toThrow(/did not respond within 30s/);
   });
 });
