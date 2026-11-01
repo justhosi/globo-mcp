@@ -7,7 +7,7 @@
  */
 
 import { createRequire } from "node:module";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { PortalAuth } from "./auth.js";
@@ -34,6 +34,16 @@ import {
 import { getAccountTimezone } from "./portal/timezone.js";
 import { getProfile } from "./portal/profile.js";
 import { checkPaging } from "./paging.js";
+import {
+  fetchArticle,
+  fetchResourceCategory,
+  fetchResourceIndex,
+  listResourcePreviews,
+  matchCategory,
+  readProfilePayload,
+  readResourcePayload,
+  readResourcesPayload,
+} from "./portal/resources.js";
 
 const require = createRequire(import.meta.url);
 const pkg = require("../package.json") as unknown as { version: string };
@@ -331,7 +341,7 @@ async function main(): Promise<void> {
     {
       title: "Payments",
       description:
-        "Show payout history from both sources: Tipalti individual payouts (date, amount, currency, status, method, payer) and the portal payroll table (per-method period summaries with method, dates, and amount). Filter Tipalti rows by date range, status or currency (case-insensitive exact match); results are paginated with per-currency and per-status totals over the Tipalti rows (each currency entry also carries the Paid-only paidAmount/paidCount). Portal rows are always complete and only date-range filtered — the two lists cover different records, do not add them together. For worked-call history use globo_list_calls.",
+        "Show payout history from both sources: Tipalti individual payouts (date, amount, currency, status, method, payer) and the portal payroll table (per-method period summaries with method, dates, and amount). Filter Tipalti rows by date range, status or currency (case-insensitive exact match); results are paginated (`total` counts Tipalti rows only) with per-currency and per-status totals over the Tipalti rows (each currency entry also carries the Paid-only paidAmount/paidCount). Portal rows are always complete and only date-range filtered — the two lists cover different records, do not add them together. For worked-call history use globo_list_calls.",
       inputSchema: z.object({
         ...dateRangeShape,
         status: z
@@ -374,6 +384,124 @@ async function main(): Promise<void> {
           settled.availability,
         );
       }),
+  );
+
+  server.registerTool(
+    "globo_resources",
+    {
+      title: "Resource index",
+      description:
+        "Browse the GLOBO knowledge base: without arguments, list all help categories with a short preview of each (previews are capped — fetch a category for its full item list). With a category name (case-insensitive substring) or section id, show that category's groups and articles with one-line descriptions. For an article's full text use globo_resource.",
+      inputSchema: z.object({
+        category: z
+          .string()
+          .optional()
+          .describe("Category name to open (or exact numeric section id). Omit for the index."),
+      }),
+      annotations: { readOnlyHint: true },
+    },
+    async ({ category }) =>
+      runTool(async () => {
+        const index = await fetchResourceIndex(auth, cache);
+        if (category === undefined) {
+          return { total: index.total, categories: index.categories };
+        }
+        const match = matchCategory(index, category);
+        if (!match) {
+          const sample = index.categories
+            .slice(0, 5)
+            .map((c) => c.name)
+            .join(", ");
+          throw new Error(
+            `Unknown resource category ${JSON.stringify(category)}. Try one of: ${sample}.`,
+          );
+        }
+        if (match.sectionId === null) {
+          throw new Error(
+            `Resource category ${JSON.stringify(match.name)} has no section page to open.`,
+          );
+        }
+        const detail = await fetchResourceCategory(auth, cache, match.sectionId);
+        return {
+          category: detail.category,
+          total: detail.total,
+          groups: detail.groups,
+        };
+      }),
+  );
+
+  server.registerTool(
+    "globo_resource",
+    {
+      title: "Resource article",
+      description:
+        "Read one GLOBO knowledge-base article by slug (lowercase letters, numbers, dashes): title, description, keywords, body text, outbound links, and media. Find slugs via globo_resources.",
+      inputSchema: z.object({
+        slug: z.string().describe("Article slug, e.g. riverdale-check-in."),
+      }),
+      annotations: { readOnlyHint: true },
+    },
+    async ({ slug }) => runTool(() => fetchArticle(auth, cache, slug)),
+  );
+
+  server.registerResource(
+    "globo-resources",
+    "globo://resources",
+    {
+      title: "GLOBO resource index",
+      description: "GLOBO knowledge-base categories with preview items, as JSON.",
+      mimeType: "application/json",
+    },
+    async (uri) => ({
+      contents: [
+        {
+          uri: uri.href,
+          mimeType: "application/json",
+          text: await readResourcesPayload(auth, cache),
+        },
+      ],
+    }),
+  );
+
+  server.registerResource(
+    "globo-resource",
+    new ResourceTemplate("globo://resource/{slug}", {
+      list: async () => ({ resources: await listResourcePreviews(auth, cache) }),
+    }),
+    {
+      title: "GLOBO resource article",
+      description: "One GLOBO knowledge-base article as JSON. Media URLs expire in about 4 hours.",
+      mimeType: "application/json",
+    },
+    async (uri, variables) => {
+      // A repeated query-style variable arrives as an array; only a single
+      // string slug is valid (anything else fails validation, no request).
+      const slug = variables["slug"];
+      return {
+        contents: [
+          {
+            uri: uri.href,
+            mimeType: "application/json",
+            text: await readResourcePayload(auth, cache, typeof slug === "string" ? slug : ""),
+          },
+        ],
+      };
+    },
+  );
+
+  server.registerResource(
+    "globo-profile",
+    "globo://profile",
+    {
+      title: "GLOBO profile",
+      description: "Who is signed in to the GLOBO Portal, as JSON.",
+      mimeType: "application/json",
+    },
+    async (uri) => ({
+      contents: [
+        { uri: uri.href, mimeType: "application/json", text: await readProfilePayload(auth) },
+      ],
+    }),
   );
 
   await server.connect(new StdioServerTransport());

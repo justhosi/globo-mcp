@@ -768,6 +768,61 @@ describe("fetchPortalPayments", () => {
       /Could not load the portal payments page \(HTTP 500\)/,
     );
   });
+
+  it("unescapes &amp; in two-parameter next links", async () => {
+    const page1 = portalPage(
+      portalRow("Direct Deposit", "09/01/2026", "$10.00", 4242),
+      `<li class="page-item next"><a href="/interpreter/payments_index?page=2&amp;per=50">Next</a></li>`,
+    );
+    const page2 = portalPage(portalRow("Check", "10/15/2026", "$20.00", 4243), nextOff);
+    const { auth, requested } = portalStub(
+      new Map([
+        ["/interpreter/payments_index", page1],
+        ["/interpreter/payments_index?page=2&per=50", page2],
+      ]),
+    );
+    const rows = await fetchPortalPayments(auth, new TtlCache());
+    expect(rows.map((row) => row.paymentId)).toEqual([4242, 4243]);
+    expect(requested).toEqual([
+      "/interpreter/payments_index",
+      "/interpreter/payments_index?page=2&per=50",
+    ]);
+  });
+
+  it("refuses off-origin and off-path next links without following them", async () => {
+    const evil = portalPage(
+      portalRow("Direct Deposit", "09/01/2026", "$10.00", 4242),
+      `<li class="page-item next"><a href="https://evil.example/x">Next</a></li>`,
+    );
+    const { auth: authEvil, requested: requestedEvil } = portalStub(
+      new Map([["/interpreter/payments_index", evil]]),
+    );
+    const evilRows = await fetchPortalPayments(authEvil, new TtlCache());
+    expect(evilRows.map((row) => row.paymentId)).toEqual([4242]);
+    expect(requestedEvil).toEqual(["/interpreter/payments_index"]);
+
+    const wrongPath = portalPage(
+      portalRow("Direct Deposit", "09/01/2026", "$10.00", 4242),
+      `<li class="page-item next"><a href="/users/edit">Next</a></li>`,
+    );
+    const { auth: authPath, requested: requestedPath } = portalStub(
+      new Map([["/interpreter/payments_index", wrongPath]]),
+    );
+    const pathRows = await fetchPortalPayments(authPath, new TtlCache());
+    expect(pathRows.map((row) => row.paymentId)).toEqual([4242]);
+    expect(requestedPath).toEqual(["/interpreter/payments_index"]);
+  });
+
+  it("stops at a self-referential next instead of duplicating rows to the cap", async () => {
+    const loop = portalPage(
+      portalRow("Direct Deposit", "09/01/2026", "$10.00", 4242),
+      `<li class="page-item next"><a href="/interpreter/payments_index">Next</a></li>`,
+    );
+    const { auth, requested } = portalStub(new Map([["/interpreter/payments_index", loop]]));
+    const rows = await fetchPortalPayments(auth, new TtlCache());
+    expect(rows.map((row) => row.paymentId)).toEqual([4242]);
+    expect(requested).toEqual(["/interpreter/payments_index"]);
+  });
 });
 
 describe("settlePaymentSources", () => {

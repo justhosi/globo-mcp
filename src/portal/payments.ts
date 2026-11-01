@@ -865,8 +865,8 @@ export function parsePortalPayments(html: string): DatedPortalPayment[] {
 
 /**
  * Next-page href from the pagy nav, or null when `next` is disabled, empty,
- * or off-portal (fail closed with a warning — a foreign target is never
- * followed).
+ * off-portal, or off the payments path (fail closed with a warning — a
+ * foreign target is never followed).
  */
 function nextPageHref(html: string, baseUrl: string): string | null {
   const item = /<li[^>]*class="([^"]*\bnext\b[^"]*)"[^>]*>([\s\S]*?)<\/li>/i.exec(html);
@@ -875,9 +875,11 @@ function nextPageHref(html: string, baseUrl: string): string | null {
   const href = /<a[^>]*href="([^"]*)"[^>]*>/i.exec(item[2] ?? "")?.[1]?.trim();
   if (!href || href === "#") return null;
   try {
-    const target = new URL(href, baseUrl);
-    if (target.origin !== new URL(baseUrl).origin) {
-      warn(`ignoring off-portal payments next link to ${JSON.stringify(target.origin)}`);
+    // Pagy hrefs are HTML-escaped (`&amp;`); unescape before use, or a
+    // two-parameter link requests a literal `&amp;`.
+    const target = new URL(href.replace(/&amp;/g, "&"), baseUrl);
+    if (target.origin !== new URL(baseUrl).origin || target.pathname !== PORTAL_PAYMENTS_PATH) {
+      warn(`ignoring unexpected payments next link to ${JSON.stringify(target.pathname)}`);
       return null;
     }
     return `${target.pathname}${target.search}`;
@@ -895,6 +897,7 @@ export async function fetchPortalPayments(
   const cached = cache.get<DatedPortalPayment[]>(PORTAL_PAYMENTS_CACHE_KEY);
   if (cached) return cached;
   const rows: DatedPortalPayment[] = [];
+  const visited = new Set<string>([PORTAL_PAYMENTS_PATH]);
   let path: string | null = PORTAL_PAYMENTS_PATH;
   for (let page = 0; page < MAX_PORTAL_PAGES && path !== null; page++) {
     const result = await auth.fetchWithAuth(path);
@@ -904,7 +907,20 @@ export async function fetchPortalPayments(
       );
     }
     rows.push(...parsePortalPayments(result.text));
-    path = nextPageHref(result.text, auth.client.baseUrl);
+    const next = nextPageHref(result.text, auth.client.baseUrl);
+    // A self-referential (or cycling) `next` would duplicate rows all the
+    // way to the page cap; stop at the first revisit instead.
+    if (next !== null) {
+      if (visited.has(next)) {
+        warn(`ignoring revisited payments page ${JSON.stringify(next)}; stopping`);
+        path = null;
+      } else {
+        visited.add(next);
+        path = next;
+      }
+    } else {
+      path = null;
+    }
   }
   if (path !== null) {
     warn(
