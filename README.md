@@ -42,7 +42,21 @@ Example requests once connected:
 
 ## Install
 
-The package is not published to npm yet, so run it from source. Clone it once:
+The package is not published to npm yet, so the recommended way to run it today is straight from GitHub — no clone, no build step:
+
+```sh
+npx -y github:justhosi/globo-mcp
+```
+
+npm builds `dist/` from source when it installs the GitHub dependency, so you always run the committed code. Once the package is published, `npx -y globo-mcp` will work too; the GitHub form keeps working either way.
+
+Three ways to get the server:
+
+1. From GitHub (recommended, works today): `npx -y github:justhosi/globo-mcp`
+2. From npm (once published — not available yet): `npx -y globo-mcp`
+3. From a local checkout (for development): clone and build as below, and run `node dist/index.js` — use this when editing the code.
+
+For option 3, clone it once:
 
 ```sh
 git clone https://github.com/justhosi/globo-mcp.git
@@ -51,7 +65,7 @@ npm install
 npm run build
 ```
 
-Note the absolute path to `dist/index.js` — every client below needs it. Print it with:
+Note the absolute path to `dist/index.js` — you need it only for a local checkout. Print it with:
 
 ```sh
 node -e "console.log(require('path').resolve('dist/index.js'))"
@@ -74,6 +88,12 @@ The server reads these environment variables:
 Start the server by hand to check it works:
 
 ```sh
+GLOBO_EMAIL='you@example.com' GLOBO_PASSWORD='your-password' npx -y github:justhosi/globo-mcp
+```
+
+From a local checkout (for development), run the built file instead:
+
+```sh
 GLOBO_EMAIL='you@example.com' GLOBO_PASSWORD='your-password' node /absolute/path/to/globo-mcp/dist/index.js
 ```
 
@@ -84,20 +104,17 @@ It prints nothing on success — it waits for JSON-RPC on stdin, and logs only t
 ### Claude Code
 
 ```sh
-claude mcp add globo \
-  --env GLOBO_EMAIL=you@example.com \
-  --env GLOBO_PASSWORD=your-password \
-  -- node /absolute/path/to/globo-mcp/dist/index.js
+claude mcp add globo --scope user --env GLOBO_EMAIL=you@example.com --env GLOBO_PASSWORD=your-password -- npx -y github:justhosi/globo-mcp
 ```
 
-Add `--scope user` to make it available in every project. To share the setup with a repository instead, commit a `.mcp.json`:
+`--scope user` makes it available in every project. To share the setup with a repository instead, commit a `.mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "globo": {
-      "command": "node",
-      "args": ["/absolute/path/to/globo-mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "github:justhosi/globo-mcp"],
       "env": {
         "GLOBO_EMAIL": "you@example.com",
         "GLOBO_PASSWORD": "your-password"
@@ -121,8 +138,8 @@ Edit the config file, then restart the app:
 {
   "mcpServers": {
     "globo": {
-      "command": "node",
-      "args": ["/absolute/path/to/globo-mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "github:justhosi/globo-mcp"],
       "env": {
         "GLOBO_EMAIL": "you@example.com",
         "GLOBO_PASSWORD": "your-password"
@@ -138,8 +155,8 @@ Add a block to `~/.codex/config.toml` (or `.codex/config.toml` inside a trusted 
 
 ```toml
 [mcp_servers.globo]
-command = "node"
-args = ["/absolute/path/to/globo-mcp/dist/index.js"]
+command = "npx"
+args = ["-y", "github:justhosi/globo-mcp"]
 startup_timeout_sec = 20
 tool_timeout_sec = 120
 
@@ -161,7 +178,7 @@ Add the server to `opencode.jsonc` (project) or `~/.config/opencode/opencode.jso
     "servers": {
       "globo": {
         "type": "local",
-        "command": ["node", "/absolute/path/to/globo-mcp/dist/index.js"],
+        "command": ["npx", "-y", "github:justhosi/globo-mcp"],
         "environment": {
           "GLOBO_EMAIL": "{env:GLOBO_EMAIL}",
           "GLOBO_PASSWORD": "{env:GLOBO_PASSWORD}",
@@ -175,7 +192,7 @@ Add the server to `opencode.jsonc` (project) or `~/.config/opencode/opencode.jso
 `{env:NAME}` reads the value from your shell environment, so the password never has to sit in the config file. Or add it from the CLI:
 
 ```sh
-opencode mcp add globo --env GLOBO_EMAIL=you@example.com --env GLOBO_PASSWORD=your-password -- node /absolute/path/to/globo-mcp/dist/index.js
+opencode mcp add globo --env GLOBO_EMAIL=you@example.com --env GLOBO_PASSWORD=your-password -- npx -y github:justhosi/globo-mcp
 ```
 
 Run `opencode mcp list` to confirm it connected; inside OpenCode, `/mcps` shows the same status.
@@ -230,6 +247,17 @@ src/http.ts         cookie jar, redirect clamping, timeouts
 src/config.ts       environment parsing
 src/portal/         one module per data area
 ```
+
+## Publishing (maintainers)
+
+The package is not published to npm yet. When it is ready:
+
+```sh
+npm login
+npm publish --access public
+```
+
+The `prepack` script builds `dist/` automatically, so the tarball is always built from source rather than a stale local copy. `npm pack --dry-run` shows what would be published (59 files, including `dist/index.js`, no tests or fixtures). Once published, `npx -y globo-mcp` works; the GitHub form keeps working either way.
 
 ## Disclaimer
 
