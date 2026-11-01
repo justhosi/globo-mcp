@@ -1,0 +1,86 @@
+{
+ "recordsTotal": 8,
+ "recordsFiltered": 8,
+ "data": [
+  {
+   "date": "10/28/2025",
+   "start": "04:05 PM",
+   "end": "04:34 PM",
+   "company": "Example Co",
+   "service": "Interpreting",
+   "call_unique_identifier": "a1b2c3d4e5",
+   "interpreter_minutes": 29,
+   "hourly_pay_units": ""
+  },
+  {
+   "date": "10/27/2025",
+   "start": "09:31 PM",
+   "end": "09:43 PM",
+   "company": "Sample Health",
+   "service": "Audio Line 1",
+   "call_unique_identifier": "f6e5d4c3b2",
+   "interpreter_minutes": 0,
+   "hourly_pay_units": ""
+  },
+  {
+   "date": "11/05/2025",
+   "start": "11:57 PM",
+   "end": "12:00 AM",
+   "company": "Acme Clinic",
+   "service": "Audio Line 2",
+   "call_unique_identifier": "0011223344",
+   "interpreter_minutes": 3,
+   "hourly_pay_units": ""
+  },
+  {
+   "date": "08/18/2026",
+   "start": "05:39 PM",
+   "end": "05:39 PM",
+   "company": "Demo Hospital",
+   "service": "Telephone Interpreting",
+   "call_unique_identifier": "abcdef0123",
+   "interpreter_minutes": 0,
+   "hourly_pay_units": ""
+  },
+  {
+   "date": "09/16/2026",
+   "start": "06:52 PM",
+   "end": "06:55 PM",
+   "company": "Test Labs",
+   "service": "Customer Line",
+   "call_unique_identifier": "9876543210",
+   "interpreter_minutes": 3,
+   "hourly_pay_units": "3 minutes of this call was serviced in the shift program"
+  },
+  {
+   "date": "10/28/2025",
+   "start": "06:39 PM",
+   "end": "06:48 PM",
+   "company": "Northwind Traders",
+   "service": "Interpreting",
+   "call_unique_identifier": "1122334455",
+   "interpreter_minutes": 9,
+   "hourly_pay_units": ""
+  },
+  {
+   "date": "02/19/2026",
+   "start": "11:42 PM",
+   "end": "12:16 AM",
+   "company": "Test Labs",
+   "service": "Audio Line 1",
+   "call_unique_identifier": "1122334455",
+   "interpreter_minutes": 34,
+   "hourly_pay_units": ""
+  },
+  {
+   "date": "09/10/2026",
+   "start": "05:05 PM",
+   "end": "05:09 PM",
+   "company": "Fabrikam Care",
+   "service": "Audio Line 2",
+   "call_unique_identifier": "deadbee042",
+   "interpreter_minutes": 3,
+   "hourly_pay_units": ""
+  }
+ ]
+}

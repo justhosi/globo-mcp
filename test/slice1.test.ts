@@ -193,7 +193,7 @@ describe("HttpClient redirect policy", () => {
       "fetch",
       vi.fn(async () => redirectTo("https://evil.example/x")),
     );
-    await expect(client.get("/users/edit")).rejects.toThrow(/unexpected host/);
+    await expect(client.get("/users/edit")).rejects.toThrow(/unexpected origin/);
   });
 
   it("refuses non-HTTP redirect targets", async () => {

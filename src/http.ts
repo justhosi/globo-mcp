@@ -83,6 +83,19 @@ export function isAuthHostUrl(url: string): boolean {
 }
 
 /**
+ * True when a URL stays on the portal or its Auth0 tenant. Origins (not bare
+ * hostnames) are compared so a non-default port counts as a different target.
+ */
+export function isPortalOrAuthUrl(url: string, baseUrl: string): boolean {
+  try {
+    const origin = new URL(url).origin;
+    return origin === new URL(baseUrl).origin || origin === `https://${AUTH_HOST}`;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * True when a redirect Location points at the Auth0 tenant, which means the
  * portal considers us logged out.
  */
@@ -148,20 +161,18 @@ export class HttpClient {
           };
         }
         const nextUrl = new URL(location, currentUrl);
-        const nextHost = nextUrl.hostname.toLowerCase();
-        const portalHost = new URL(this.baseUrl).hostname.toLowerCase();
         if (nextUrl.protocol !== "https:" && nextUrl.protocol !== "http:") {
           throw new Error(
-            `Refusing to follow portal redirect to non-HTTP target on host ${JSON.stringify(nextHost)}.`,
+            `Refusing to follow portal redirect to non-HTTP target ${JSON.stringify(nextUrl.origin)}.`,
           );
         }
-        // Never leak this client off the portal / login-provider hosts.
-        if (nextHost !== portalHost && nextHost !== AUTH_HOST) {
+        // Never leak this client off the portal / login-provider origins.
+        if (!isPortalOrAuthUrl(nextUrl.toString(), this.baseUrl)) {
           throw new Error(
-            `Refusing to follow portal redirect to unexpected host ${JSON.stringify(nextHost)}.`,
+            `Refusing to follow portal redirect to unexpected origin ${JSON.stringify(nextUrl.origin)}.`,
           );
         }
-        const hostChanged = nextHost !== new URL(currentUrl).hostname.toLowerCase();
+        const hostChanged = nextUrl.origin !== new URL(currentUrl).origin;
         currentUrl = nextUrl.toString();
         // Per fetch semantics: 303 always becomes GET; 301/302 turn POST into
         // GET. Additionally, always drop the body when crossing hosts so a

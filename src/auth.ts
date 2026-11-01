@@ -15,7 +15,7 @@
  */
 
 import type { GloboConfig } from "./config.js";
-import { AUTH_HOST, type FetchResult, HttpClient } from "./http.js";
+import { AUTH_HOST, type FetchResult, HttpClient, isPortalOrAuthUrl } from "./http.js";
 
 const SESSION_COOKIE = "_globo-portal_session";
 const MAX_HOPS = 10;
@@ -77,6 +77,12 @@ function detectAuth0Problem(html: string): string | undefined {
 export class PortalAuth {
   // Protected (not private) so tests can subclass and observe login attempts.
   protected loggedIn = false;
+  /**
+   * In-flight login promise. Data requests fan out (`Promise.all` in the
+   * tools), so concurrent callers must share one Auth0 flow instead of
+   * trampling each other's transaction cookies in the shared jar.
+   */
+  private loginInFlight: Promise<void> | undefined;
 
   constructor(
     private readonly config: GloboConfig,
@@ -101,9 +107,40 @@ export class PortalAuth {
    * Sign in. With `GLOBO_SESSION_COOKIE` this is a no-op (the cookie is
    * already seeded); otherwise it runs the Auth0 form flow.
    *
+   * Single-flight: when several callers sign in at once (a cold start fans
+   * out parallel data requests), the first starts the flow and the rest await
+   * the same promise, so all observe the same outcome and only one Auth0
+   * transaction touches the shared cookie jar. The slot is cleared in a
+   * `finally`, so a failed login can be retried by a later call.
+   *
    * @throws GloboAuthError with a friendly message when sign-in fails.
    */
   async login(): Promise<void> {
+    const running = this.loginInFlight;
+    if (running) {
+      await running;
+      return;
+    }
+    // Created and stored synchronously (no await between), so a concurrent
+    // caller can never slip past the check above and start a second flow.
+    const attempt = this.performLogin();
+    this.loginInFlight = attempt;
+    try {
+      await attempt;
+    } finally {
+      if (this.loginInFlight === attempt) {
+        this.loginInFlight = undefined;
+      }
+    }
+  }
+
+  /**
+   * The actual sign-in work behind {@link login}. Protected (not private) so
+   * tests can subclass and observe or stub login attempts.
+   *
+   * @throws GloboAuthError with a friendly message when sign-in fails.
+   */
+  protected async performLogin(): Promise<void> {
     if (this.config.sessionCookie && !this.config.password) {
       // Cookie-only mode: nothing to submit; validity is proven by requests.
       this.loggedIn = true;
@@ -128,7 +165,9 @@ export class PortalAuth {
   /**
    * GET a portal path with a valid session, signing in first when needed. If
    * the response shows we are logged out, sign in ONCE and retry the request
-   * once.
+   * once. Concurrent callers that all find an expired session share the one
+   * re-login (via {@link login}) and each still retries its own request
+   * exactly once.
    */
   async fetchWithAuth(path: string): Promise<FetchResult> {
     await this.ensureSession();
@@ -265,11 +304,21 @@ export class PortalAuth {
     }
   }
 
-  /** Follow 3xx hops one by one (cookies collected per hop) until a page. */
+  /**
+   * Follow 3xx hops one by one (cookies collected per hop) until a page.
+   * Enforces the same "never leave the portal and its login provider"
+   * invariant as `HttpClient.request`.
+   */
   private async followRedirects(startUrl: string): Promise<FetchResult> {
+    const base = this.config.baseUrl;
     let current = startUrl;
     let last: FetchResult | undefined;
     for (let hop = 0; hop < MAX_HOPS; hop++) {
+      if (!isPortalOrAuthUrl(current, base)) {
+        throw new GloboAuthError(
+          "Sign-in tried to leave the portal and its login provider. Aborting sign-in.",
+        );
+      }
       last = await this.http.requestOnce(current);
       const location = last.headers.get("location");
       if (last.status >= 300 && last.status < 400 && location) {

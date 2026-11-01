@@ -1,0 +1,28 @@
+{
+ "data": [
+  {
+   "month": "10 / 2025",
+   "raw_date": "2025-10-01T00:00:00.000Z",
+   "total_calls": 21,
+   "total_minutes": 376.0
+  },
+  {
+   "month": "11 / 2025",
+   "raw_date": "2025-11-01T00:00:00.000Z",
+   "total_calls": 106,
+   "total_minutes": 1410.0
+  },
+  {
+   "month": "12 / 2025",
+   "raw_date": "2025-12-01T00:00:00.000Z",
+   "total_calls": 88,
+   "total_minutes": 1065.0
+  },
+  {
+   "month": "01 / 2026",
+   "raw_date": "2026-01-01T00:00:00.000Z",
+   "total_calls": 51,
+   "total_minutes": 449.0
+  }
+ ]
+}

@@ -1,0 +1,56 @@
+{
+ "recordsTotal": 5,
+ "recordsFiltered": 5,
+ "data": [
+  {
+   "date": "10/27/2025",
+   "start": "09:44 PM",
+   "end": "09:47 PM",
+   "company": "Example Co",
+   "service": "Interpreting",
+   "call_unique_identifier": null,
+   "interpreter_minutes": 0,
+   "hourly_pay_units": ""
+  },
+  {
+   "date": "09/14/2026",
+   "start": "05:25 PM",
+   "end": "05:32 PM",
+   "company": "Sample Health",
+   "service": "Audio Line 1",
+   "call_unique_identifier": null,
+   "interpreter_minutes": 6,
+   "hourly_pay_units": "6 minutes of this call was serviced in the shift program"
+  },
+  {
+   "date": "10/28/2025",
+   "start": "08:29 PM",
+   "end": "10:08 PM",
+   "company": "Acme Clinic",
+   "service": "Audio Line 2",
+   "call_unique_identifier": null,
+   "interpreter_minutes": 98,
+   "hourly_pay_units": ""
+  },
+  {
+   "date": "10/29/2025",
+   "start": "05:18 PM",
+   "end": "05:19 PM",
+   "company": "Demo Hospital",
+   "service": "Telephone Interpreting",
+   "call_unique_identifier": null,
+   "interpreter_minutes": 1,
+   "hourly_pay_units": ""
+  },
+  {
+   "date": "10/29/2025",
+   "start": "08:10 PM",
+   "end": "08:58 PM",
+   "company": "Test Labs",
+   "service": "Customer Line",
+   "call_unique_identifier": null,
+   "interpreter_minutes": 47,
+   "hourly_pay_units": ""
+  }
+ ]
+}

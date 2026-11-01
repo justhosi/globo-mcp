@@ -84,6 +84,97 @@ describe("PortalAuth.fetchWithAuth", () => {
   });
 });
 
+describe("PortalAuth concurrent login (single-flight)", () => {
+  /** Auth whose login waits on a gate so concurrent callers pile up on it. */
+  class GatedAuth extends PortalAuth {
+    loginCalls = 0;
+    private releaseGate: () => void = () => {};
+    private readonly gate = new Promise<void>((resolve) => {
+      this.releaseGate = resolve;
+    });
+
+    protected override async performLogin(): Promise<void> {
+      this.loginCalls += 1;
+      await this.gate;
+      this.loggedIn = true;
+    }
+
+    release(): void {
+      this.releaseGate();
+    }
+  }
+
+  /** Auth whose login fails until `failLogin` is switched off. */
+  class FlakyAuth extends PortalAuth {
+    attempts = 0;
+    failLogin = true;
+
+    protected override async performLogin(): Promise<void> {
+      this.attempts += 1;
+      if (this.failLogin) {
+        throw new GloboAuthError("boom (test-only failure)");
+      }
+      this.loggedIn = true;
+    }
+  }
+
+  function jsonResult(path: string): FetchResult {
+    return {
+      status: 200,
+      headers: new Headers({ "content-type": "application/json" }),
+      text: `{"path":${JSON.stringify(path)}}`,
+      url: `${BASE_URL}${path}`,
+    };
+  }
+
+  it("runs one login for N concurrent fetchWithAuth calls and resolves all", async () => {
+    const http = new HttpClient(BASE_URL);
+    http.get = async (path: string): Promise<FetchResult> => jsonResult(path);
+    const auth = new GatedAuth(passwordConfig(), http);
+
+    const pending = Promise.all([
+      auth.fetchWithAuth("/interpreter/a"),
+      auth.fetchWithAuth("/interpreter/b"),
+      auth.fetchWithAuth("/interpreter/c"),
+    ]);
+    // Let every caller reach the login gate before releasing it, so the test
+    // fails if any caller starts its own flow instead of joining.
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    auth.release();
+    const results = await pending;
+
+    expect(auth.loginCalls).toBe(1);
+    expect(results.map((r) => r.url)).toEqual([
+      `${BASE_URL}/interpreter/a`,
+      `${BASE_URL}/interpreter/b`,
+      `${BASE_URL}/interpreter/c`,
+    ]);
+  });
+
+  it("shares one login failure with all concurrent callers, then allows retry", async () => {
+    const http = new HttpClient(BASE_URL);
+    http.get = async (path: string): Promise<FetchResult> => jsonResult(path);
+    const auth = new FlakyAuth(passwordConfig(), http);
+
+    const settled = await Promise.allSettled([
+      auth.fetchWithAuth("/interpreter/a"),
+      auth.fetchWithAuth("/interpreter/b"),
+    ]);
+    expect(auth.attempts).toBe(1);
+    expect(settled.map((s) => s.status)).toEqual(["rejected", "rejected"]);
+    const reasons = settled.map((s) => (s.status === "rejected" ? s.reason : undefined));
+    expect(reasons[0]).toBeInstanceOf(GloboAuthError);
+    // Same outcome object for every joiner, not one error per caller.
+    expect(reasons[1]).toBe(reasons[0]);
+
+    // The in-flight slot is cleared, so a later call can log in again.
+    auth.failLogin = false;
+    const retry = await auth.fetchWithAuth("/interpreter/a");
+    expect(retry.url).toBe(`${BASE_URL}/interpreter/a`);
+    expect(auth.attempts).toBe(2);
+  });
+});
+
 describe("PortalAuth.login password flow (stubbed transport)", () => {
   it("maps a wrong-password Auth0 page to a friendly error with no HTML", async () => {
     const http = new HttpClient(BASE_URL);
