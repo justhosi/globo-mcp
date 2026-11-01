@@ -68,6 +68,17 @@ describe("parseResourceIndex", () => {
     expect(parsed.categories[3]?.previewItems).toEqual([]);
   });
 
+  it("survives a nested div inside a category block", () => {
+    // The first block carries a nested promo div before its item list: a
+    // lazy first-</div> capture would end there, losing the previews, the
+    // section id, and the More link.
+    const first = index().categories[0];
+    expect(first?.previewCount).toBe(3);
+    expect(first?.sectionId).toBe(101);
+    expect(first?.hasMore).toBe(true);
+    expect(first?.sectionUrl).toBe("/faq_sections/101");
+  });
+
   it("throws a friendly error when no category blocks exist", () => {
     expect(() => parseResourceIndex("<html><body><h2>Resources</h2></body></html>")).toThrow(
       /without categories/,
@@ -109,6 +120,17 @@ describe("parseResourceCategory", () => {
   it("skips malformed rows without failing the page", () => {
     const detail = parseResourceCategory(fixture("faq-section.html"), 101);
     expect(detail.groups[0]?.items.map((item) => item.title)).toEqual(["Arriving early"]);
+  });
+
+  it("survives a nested div inside a row", () => {
+    // The check-in row opens with a nested badge div: a lazy first-</div>
+    // capture would end there, dropping the row's link and description.
+    const detail = parseResourceCategory(fixture("faq-section.html"), 101);
+    expect(detail.groups[1]?.items[0]).toEqual({
+      title: "Checking in for your shift",
+      slug: "riverdale-check-in",
+      description: "Badge, desk, and first call",
+    });
   });
 
   it("throws a friendly error when breadcrumbs are missing", () => {

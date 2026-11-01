@@ -202,10 +202,16 @@ function absoluteLink(href: string, base: string): string | null {
  */
 export function parseResourceIndex(html: string): ResourceIndex {
   const categories: ResourceCategory[] = [];
-  const blockRe = /<div[^>]*class="[^"]*\bcol-sm-6\b[^"]*"[^>]*>([\s\S]*?)<\/div>/gi;
-  let block: RegExpExecArray | null;
-  while ((block = blockRe.exec(html)) !== null) {
-    const inner = block[1] ?? "";
+  const blockOpenRe = /<div[^>]*class="[^"]*\bcol-sm-6\b[^"]*"[^>]*>/gi;
+  let open: RegExpExecArray | null;
+  while ((open = blockOpenRe.exec(html)) !== null) {
+    // Depth-scanned: a `<div>` nested inside the block no longer truncates
+    // the capture (and with it the previews, id, and More link).
+    const inner = captureDivAt(html, open.index);
+    if (inner === null) {
+      warn("skipping resource block with unbalanced markup");
+      continue;
+    }
     const name = textCell(/<h2[^>]*>([\s\S]*?)<\/h2>/i.exec(inner)?.[1]);
     if (name === null) {
       warn("skipping resource block without a heading");
@@ -301,17 +307,20 @@ export function parseResourceCategory(html: string, sectionId: number): Resource
   const name = crumbNames.length === 0 ? null : (crumbNames[crumbNames.length - 1] ?? null);
 
   const groups: CategoryGroup[] = [];
-  const boundaryRe = /<div[^>]*class="[^"]*\bibox-title\b[^"]*"[^>]*>([\s\S]*?)<\/div>/gi;
+  const boundaryOpenRe = /<div[^>]*class="[^"]*\bibox-title\b[^"]*"[^>]*>/gi;
   const boundaries: { index: number; name: string | null }[] = [];
-  let boundary: RegExpExecArray | null;
-  while ((boundary = boundaryRe.exec(html)) !== null) {
+  let boundaryOpen: RegExpExecArray | null;
+  while ((boundaryOpen = boundaryOpenRe.exec(html)) !== null) {
+    // Depth-scanned like everything else: nested markup inside the title
+    // cannot cut the `h4` lookup short.
+    const inner = captureDivAt(html, boundaryOpen.index);
     boundaries.push({
-      index: boundary.index,
-      name: textCell(/<h4[^>]*>([\s\S]*?)<\/h4>/i.exec(boundary[1] ?? "")?.[1]),
+      index: boundaryOpen.index,
+      name: inner === null ? null : textCell(/<h4[^>]*>([\s\S]*?)<\/h4>/i.exec(inner)?.[1]),
     });
   }
-  const rowRe = /<div[^>]*class="[^"]*\binline\b[^"]*"[^>]*>([\s\S]*?)<\/div>/gi;
-  let row: RegExpExecArray | null;
+  const rowOpenRe = /<div[^>]*class="[^"]*\binline\b[^"]*"[^>]*>/gi;
+  let rowOpen: RegExpExecArray | null;
   // Walk rows in page order; each `ibox-title` boundary opens a new group
   // (null-named when it carries no `h4`), rows before any title form a
   // leading null group, and empty groups are dropped at the end.
@@ -323,14 +332,20 @@ export function parseResourceCategory(html: string, sectionId: number): Resource
     }
     current = null;
   };
-  while ((row = rowRe.exec(html)) !== null) {
-    while (boundaryAt < boundaries.length && (boundaries[boundaryAt]?.index ?? 0) < row.index) {
+  while ((rowOpen = rowOpenRe.exec(html)) !== null) {
+    while (boundaryAt < boundaries.length && (boundaries[boundaryAt]?.index ?? 0) < rowOpen.index) {
       flush();
       current = { name: boundaries[boundaryAt]?.name ?? null, items: [] };
       boundaryAt += 1;
     }
     if (!current) current = { name: null, items: [] };
-    const inner = row[1] ?? "";
+    // Depth-scanned: a `<div>` nested inside the row no longer truncates the
+    // capture (and with it the `<small>` description).
+    const inner = captureDivAt(html, rowOpen.index);
+    if (inner === null) {
+      warn("skipping resource row with unbalanced markup");
+      continue;
+    }
     const href = /<a[^>]*href="([^"]*)"[^>]*>/i.exec(inner)?.[1]?.trim() ?? "";
     const slug = /^\/slug\/([A-Za-z0-9-]+)$/.exec(href)?.[1];
     const title = textCell(/<strong[^>]*>([\s\S]*?)<\/strong>/i.exec(inner)?.[1]);
@@ -384,18 +399,32 @@ export async function fetchResourceCategory(
  * exists. The scan always terminates: every alternative consumes input, and
  * an unbalanced remainder simply yields null (fail closed, never hang).
  */
+/**
+ * Capture the inner HTML of the `<div` opening at `index`, depth-scanned to
+ * its matching close (script/style blocks and comments skipped as units).
+ * Returns null when unbalanced or when nothing opens at `index` — fail
+ * closed, never hang. A `<div>` nested inside the capture no longer
+ * truncates it, unlike a lazy `([\s\S]*?)<\/div>` match.
+ */
+function captureDivAt(html: string, index: number): string | null {
+  const open = /^<div\b[^>]*>/i.exec(html.slice(index));
+  if (!open) return null;
+  const end = scanToClose(html, index + open[0].length, 1);
+  return end === null ? null : html.slice(index + open[0].length, end);
+}
+
 function extractBodyContainer(html: string): string | null {
   const marker = /<div[^>]*class="[^"]*\bhr-line-dashed\b[^"]*"[^>]*>\s*<\/div>/i.exec(html);
   if (!marker) return null;
   const rest = html.slice(marker.index + marker[0].length);
   // Text layout: a content div opens right after the marker (modulo
-  // whitespace/comments) — depth-scan it for its matching close.
+  // whitespace/comments) — capture it. Unbalanced markup falls through to
+  // the parent span below instead of failing.
   const skipped = /^(?:\s|<!--[\s\S]*?-->)*/.exec(rest)?.[0].length ?? 0;
-  const after = rest.slice(skipped);
-  const open = /^<div\b[^>]*>/i.exec(after);
-  if (open) {
-    const end = scanToClose(after, open[0].length, 1);
-    return end === null ? null : after.slice(open[0].length, end);
+  const contentAt = marker.index + marker[0].length + skipped;
+  if (/^<div\b/i.test(html.slice(contentAt))) {
+    const captured = captureDivAt(html, contentAt);
+    if (captured !== null) return captured;
   }
   // Video layout: no content div — the marker's own parent holds the
   // video/script, so scan to the enclosing close instead.
