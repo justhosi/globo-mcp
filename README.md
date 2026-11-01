@@ -116,13 +116,15 @@ claude mcp add globo --scope user --env GLOBO_EMAIL=you@example.com --env GLOBO_
       "command": "npx",
       "args": ["-y", "github:justhosi/globo-mcp"],
       "env": {
-        "GLOBO_EMAIL": "you@example.com",
-        "GLOBO_PASSWORD": "your-password"
+        "GLOBO_EMAIL": "${GLOBO_EMAIL}",
+        "GLOBO_PASSWORD": "${GLOBO_PASSWORD}"
       }
     }
   }
 }
 ```
+
+Claude Code expands `${VAR}` from your environment, so a committed `.mcp.json` carries no credentials — export `GLOBO_EMAIL` and `GLOBO_PASSWORD` in your shell rather than pasting them into the file.
 
 Check it with `/mcp` inside Claude Code.
 
@@ -157,7 +159,8 @@ Add a block to `~/.codex/config.toml` (or `.codex/config.toml` inside a trusted 
 [mcp_servers.globo]
 command = "npx"
 args = ["-y", "github:justhosi/globo-mcp"]
-startup_timeout_sec = 20
+# The first run fetches the repo, installs and builds it, which can take a while.
+startup_timeout_sec = 60
 tool_timeout_sec = 120
 
 [mcp_servers.globo.env]
@@ -208,14 +211,14 @@ Run `opencode mcp list` to confirm it connected; inside OpenCode, `/mcps` shows 
 
 ## Troubleshooting
 
-| Symptom                                           | Cause and fix                                                                                                                                                           |
-| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Sign-in failed: wrong email or password`         | Check `GLOBO_EMAIL` / `GLOBO_PASSWORD`. No third-party login is involved.                                                                                               |
-| `Sign-in needs multi-factor authentication (MFA)` | Your account has MFA enabled. Sign in to the portal in a browser, copy the `_globo-portal_session` cookie value and set `GLOBO_SESSION_COOKIE` instead of the password. |
-| Tools work, then fail after a while               | Sessions expire. The server re-signs in automatically once; if the session came from `GLOBO_SESSION_COOKIE`, it cannot, and you need a fresh cookie.                    |
-| `The portal did not respond within 30s`           | The portal was slow or unreachable. Retry; raise the client's tool timeout if it happens on cold starts.                                                                |
-| A tool reports the page layout changed            | GLOBO changed its HTML. The parsers are defensive by design, but a redesign needs a code update.                                                                        |
-| Nothing appears in the client                     | Check the absolute path to `dist/index.js`, and that you ran `npm run build`. Servers receive no stdout chatter — logs go to stderr.                                    |
+| Symptom                                           | Cause and fix                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Sign-in failed: wrong email or password`         | Check `GLOBO_EMAIL` / `GLOBO_PASSWORD`. No third-party login is involved.                                                                                                                                                                                                         |
+| `Sign-in needs multi-factor authentication (MFA)` | Your account has MFA enabled. Sign in to the portal in a browser, copy the `_globo-portal_session` cookie value and set `GLOBO_SESSION_COOKIE` instead of the password.                                                                                                           |
+| Tools work, then fail after a while               | Sessions expire. The server re-signs in automatically once; if the session came from `GLOBO_SESSION_COOKIE`, it cannot, and you need a fresh cookie.                                                                                                                              |
+| `The portal did not respond within 30s`           | The portal was slow or unreachable. Retry; raise the client's tool timeout if it happens on cold starts.                                                                                                                                                                          |
+| A tool reports the page layout changed            | GLOBO changed its HTML. The parsers are defensive by design, but a redesign needs a code update.                                                                                                                                                                                  |
+| Nothing appears in the client                     | With the `npx` route the first start needs network: it fetches the repo, installs and builds, so allow up to a minute. From a local checkout, check the absolute path to `dist/index.js` and that you ran `npm run build`. Servers receive no stdout chatter — logs go to stderr. |
 
 ## Privacy and security
 
