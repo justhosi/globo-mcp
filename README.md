@@ -183,9 +183,10 @@ Run `opencode mcp list` to confirm it connected; inside OpenCode, `/mcps` shows 
 ## How the data is interpreted
 
 - **Minutes are the audited figure.** The portal reports `interpreter_minutes` for a call, and that is what it bills and pays on. When it is missing (a call not yet audited), the server falls back to the clock difference between start and end and says so per row.
-- **Dates are the portal's local dates**, in your profile's timezone (see `globo_whoami`). Every response echoes the zone, or `null` with a note when the page itself states none.
+- **Dates are the portal's local dates**, in your profile's timezone (see `globo_whoami`). Every analytics response echoes the zone, or `null` when the page states none — `globo_scheduled_calls` and `globo_payments` add a note explaining why.
 - **Payments come from two places and are never added together.** Tipalti rows are individual payouts; the portal row set is per-method period summaries. `sources` tells you which of the two answered, and `totals.byCurrency` carries both all-status figures (`amount`, `count`) and Paid-only figures (`paidAmount`, `paidCount`), so a rejected payout is never quoted as money received.
 - **Scheduled calls are the portal's table**, not a calendar feed: completed and cancelled entries stay in the list, and `upcoming_only` compares against the account timezone.
+- **Long lists are paged.** The list tools return at most 1,000 rows per call (`limit`), with `offset` to walk deeper; totals always describe the whole filtered set, not the page.
 - **Resources are the interpreter knowledge base.** Video articles have no prose — the media URL is returned in `media` with a note that it expires in about four hours.
 
 ## Troubleshooting
@@ -203,7 +204,7 @@ Run `opencode mcp list` to confirm it connected; inside OpenCode, `/mcps` shows 
 
 - Credentials are read from the environment, never written to disk, and never logged. The session cookie lives in memory for the life of the process.
 - The server only reads. It cannot schedule, cancel, accept or decline anything, and it cannot send messages.
-- It only ever requests the portal hosts (`globohq.com`, `auth.globohq.cloud`) and Tipalti's payment endpoint. Redirects are followed manually and clamped to those hosts, because a redirect must never carry a password or a payment token to another domain.
+- It only ever requests the portal hosts (`globohq.com`, `auth.globohq.cloud`) and Tipalti's payee dashboard (`ui2.tipalti.com`). Redirects are followed manually and clamped to those hosts, because a redirect must never carry a password or a payment token to another domain.
 - It reads only the signed-in account's own pages. The portal has a platform-wide endpoint that would return other interpreters' names and phone numbers (`/scheduled_calls/get_data`); this project never calls it, deliberately.
 - Payment detail links are recorded, never fetched.
 - No telemetry, no analytics, no external service.
