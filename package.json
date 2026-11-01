@@ -5,9 +5,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hossein-mohammadzadeh/globo-mcp.git"
+    "url": "https://github.com/justhosi/globo-mcp.git"
   },
-  "homepage": "https://github.com/hossein-mohammadzadeh/globo-mcp#readme",
+  "homepage": "https://github.com/justhosi/globo-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/justhosi/globo-mcp/issues"
+  },
   "keywords": [
     "mcp",
     "model-context-protocol",
