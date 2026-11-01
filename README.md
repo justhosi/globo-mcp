@@ -3,16 +3,18 @@
 Unofficial MCP server (stdio transport) for the [GLOBO Portal](https://globohq.com/),
 an interpreter-work portal. No browser required.
 
-> Exposes five read-only tools: `globo_whoami` (signed-in profile), `globo_call_summary` (call counts and minutes over a range), `globo_list_calls` (individual call rows), `globo_monthly_minutes` (the portal's audited monthly rollup), and `globo_scheduled_calls` (scheduled appointments from your per-user schedule).
+> Exposes six read-only tools: `globo_whoami` (signed-in profile), `globo_call_summary` (call counts and minutes over a range), `globo_list_calls` (individual call rows), `globo_monthly_minutes` (the portal's audited monthly rollup), `globo_scheduled_calls` (scheduled appointments from your per-user schedule), and `globo_assignments` (the interpreter's assignment history).
 >
 > Privacy note: `globo_scheduled_calls` reads only the signed-in user's own table on `/scheduled_calls`. It never calls `/scheduled_calls/get_data` — that endpoint is not user-scoped and returns the whole platform's schedule (other people's names, phone numbers, and appointments).
 
 ## Status
 
-Early work-in-progress. **5 of 9 planned tools** are shipped; the remaining
-four are `globo_assignments` (assignment history), `globo_payments` (payout
-history), and `globo_resources` / `globo_resource` (portal documentation).
-The five shipped tools are stable and covered by fixture-driven tests.
+Early work-in-progress. **6 of 9 planned tools** are shipped; the remaining
+three are `globo_payments` (payout history) and `globo_resources` /
+`globo_resource` (portal documentation). The six shipped tools include
+`globo_assignments`, which reads the interpreter's assignment history — a
+record separate from ordinary calls that may carry an informational note — and
+are stable and covered by fixture-driven tests.
 
 ## Disclaimer
 
