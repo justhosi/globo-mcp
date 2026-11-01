@@ -11,6 +11,11 @@
 const MAX_REDIRECTS = 10;
 /** Host of the Auth0 tenant the portal delegates sign-in to. */
 export const AUTH_HOST = "auth.globohq.cloud";
+/**
+ * Default per-request timeout. One hung connection must never block every
+ * tool (a single-flight login waits on it), so each hop gets its own budget.
+ */
+export const DEFAULT_REQUEST_TIMEOUT_MS = 30_000;
 
 /** Final response of a request after following redirects. */
 export interface FetchResult {
@@ -121,7 +126,32 @@ function isRedirect(status: number): boolean {
 export class HttpClient {
   readonly jar = new CookieJar();
 
-  constructor(readonly baseUrl: string) {}
+  constructor(
+    readonly baseUrl: string,
+    private readonly timeoutMs: number = DEFAULT_REQUEST_TIMEOUT_MS,
+  ) {}
+
+  /**
+   * One `fetch` with the client timeout (fresh budget per redirect hop and
+   * per login step). An abort becomes a clear error naming the wait;
+   * anything else propagates untouched.
+   */
+  private async timedFetch(url: string, init: RequestInit): Promise<Response> {
+    try {
+      return await fetch(url, { ...init, signal: AbortSignal.timeout(this.timeoutMs) });
+    } catch (error) {
+      if (
+        error instanceof DOMException &&
+        (error.name === "AbortError" || error.name === "TimeoutError")
+      ) {
+        throw new Error(
+          `The portal did not respond within ${Math.round(this.timeoutMs / 1000)}s. ` +
+            "The portal may be down or slow — try again later.",
+        );
+      }
+      throw error;
+    }
+  }
 
   /**
    * Fetch a URL, following redirects manually while accumulating cookies.
@@ -140,7 +170,7 @@ export class HttpClient {
       const cookie = this.jar.headerFor(currentUrl);
       if (cookie) headers.set("Cookie", cookie);
 
-      const response = await fetch(currentUrl, {
+      const response = await this.timedFetch(currentUrl, {
         ...init,
         method,
         body,
@@ -209,7 +239,7 @@ export class HttpClient {
     const cookie = this.jar.headerFor(url);
     if (cookie) headers.set("Cookie", cookie);
 
-    const response = await fetch(url, { ...init, headers, redirect: "manual" });
+    const response = await this.timedFetch(url, { ...init, headers, redirect: "manual" });
     this.jar.storeFromResponse(response, url);
     // Redirect bodies are discarded; callers read the target from the
     // `location` response header.

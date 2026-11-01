@@ -243,4 +243,20 @@ describe("HttpClient redirect policy", () => {
     expect(calls[1]?.init.method).toBe("POST");
     expect(calls[1]?.init.body).toContain("a=b");
   });
+
+  it("maps a hung connection to a clear timeout error", async () => {
+    const client = new HttpClient("https://globohq.com", 50);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        (_url: string, init: RequestInit) =>
+          new Promise<Response>((_resolve, reject) => {
+            init.signal?.addEventListener("abort", () => {
+              reject(new DOMException("The operation timed out.", "TimeoutError"));
+            });
+          }),
+      ),
+    );
+    await expect(client.get("/users/edit")).rejects.toThrow(/did not respond within/);
+  });
 });

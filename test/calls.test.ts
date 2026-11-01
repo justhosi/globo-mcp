@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { PortalAuth } from "../src/auth.js";
 import {
   bucketFor,
@@ -16,6 +16,7 @@ import {
   parsePortalTime,
   summarizeCalls,
   totalOf,
+  type CallRecord,
   type DatedCall,
 } from "../src/portal/calls.js";
 import { CACHE_TTL_MS, TtlCache } from "../src/portal/cache.js";
@@ -109,6 +110,73 @@ describe("parseCallLog", () => {
     expect(rows[7]?.portalMinutes).toBe(3);
   });
 
+  it("treats a negative interpreter_minutes as missing and falls back to clock time", () => {
+    const rows = parseCallLog({
+      recordsTotal: 1,
+      recordsFiltered: 1,
+      data: [
+        {
+          date: "10/28/2025",
+          start: "04:05 PM",
+          end: "04:34 PM",
+          company: "Example Co",
+          service: "Interpreting",
+          call_unique_identifier: "a1b2c3d4e5",
+          interpreter_minutes: -1,
+          hourly_pay_units: "",
+        },
+      ],
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.portalMinutes).toBeNull();
+    expect(rows[0]?.minutes).toBe(29);
+  });
+
+  it("warns about truncation from what the portal sent, not what parsed", () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      // One good row + one malformed row, portal claims 2: no truncation.
+      parseCallLog({
+        recordsTotal: 2,
+        recordsFiltered: 2,
+        data: [
+          {
+            date: "10/28/2025",
+            start: "04:05 PM",
+            end: "04:34 PM",
+            company: "Example Co",
+            service: "Interpreting",
+            call_unique_identifier: "a1b2c3d4e5",
+            interpreter_minutes: 29,
+            hourly_pay_units: "",
+          },
+          42,
+        ],
+      });
+      expect(spy.mock.calls.flat().join("\n")).not.toMatch(/truncated/);
+      // Same payload, portal claims 5: genuinely truncated.
+      parseCallLog({
+        recordsTotal: 5,
+        recordsFiltered: 5,
+        data: [
+          {
+            date: "10/28/2025",
+            start: "04:05 PM",
+            end: "04:34 PM",
+            company: "Example Co",
+            service: "Interpreting",
+            call_unique_identifier: "a1b2c3d4e5",
+            interpreter_minutes: 29,
+            hourly_pay_units: "",
+          },
+          42,
+        ],
+      });
+      expect(spy.mock.calls.flat().join("\n")).toMatch(/truncated by the portal \(2 of 5 rows\)/);
+    } finally {
+      spy.mockRestore();
+    }
+  });
   it("computes a midnight crossing from start/end when portalMinutes is 0", () => {
     const rows = parseCallLog({
       data: [
@@ -254,6 +322,22 @@ describe("grouping", () => {
       telephone_minutes: 38,
     });
   });
+
+  it("pins per-type columns when one bucket holds both logs", () => {
+    // Telephone row 0 (2025-10-28, 29 min) and video row 2 (2025-10-28, 98
+    // min) share the 2025-10 bucket.
+    const rows = buildBreakdown(telCalls().slice(0, 1), vidCalls().slice(2, 3), "month");
+    expect(rows).toEqual([
+      {
+        bucket: "2025-10",
+        telephone_calls: 1,
+        telephone_minutes: 29,
+        video_calls: 1,
+        video_minutes: 98,
+        total_minutes: 127,
+      },
+    ]);
+  });
 });
 
 describe("summarizeCalls and listCalls", () => {
@@ -322,11 +406,18 @@ describe("summarizeCalls and listCalls", () => {
   });
 
   it("totalOf skips null minutes", () => {
-    expect(totalOf([{ minutes: null, calls: 0 } as unknown as DatedCall])).toEqual({
-      calls: 1,
-      minutes: 0,
-      hours: 0,
-    });
+    const row: CallRecord = {
+      date: "2026-01-01",
+      start: "",
+      end: "",
+      company: null,
+      service: null,
+      callId: null,
+      minutes: null,
+      portalMinutes: null,
+      note: null,
+    };
+    expect(totalOf([row])).toEqual({ calls: 1, minutes: 0, hours: 0 });
   });
 });
 
@@ -342,7 +433,7 @@ describe("monthly rollup", () => {
   it("parses and sorts the fixture ascending", () => {
     const months = parseMonthlyMinutes(JSON.parse(fixture("monthly-minutes.json")) as unknown);
     expect(months.map((m) => m.month)).toEqual(["2025-10", "2025-11", "2025-12", "2026-01"]);
-    expect(months[0]).toEqual({ month: "2025-10", calls: 21, minutes: 376 });
+    expect(months[0]).toEqual({ month: "2025-10", calls: 14, minutes: 187 });
   });
 
   it("throws on a malformed envelope, skips bad rows", () => {

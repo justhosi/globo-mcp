@@ -2,7 +2,8 @@
 /**
  * globo-mcp: unofficial MCP server (stdio) for the GLOBO Portal.
  *
- * Read-only analytics over the interpreter call logs plus `globo_whoami`.
+ * Read-only analytics over the interpreter call logs, the per-user schedule,
+ * and `globo_whoami`.
  */
 
 import { createRequire } from "node:module";
@@ -22,6 +23,7 @@ import {
 } from "./portal/calls.js";
 import { TtlCache } from "./portal/cache.js";
 import { fetchMonthlyMinutes } from "./portal/monthly.js";
+import { fetchScheduledCalls, listScheduledCalls } from "./portal/scheduled.js";
 import { getAccountTimezone } from "./portal/timezone.js";
 import { getProfile } from "./portal/profile.js";
 
@@ -70,9 +72,14 @@ function parseRange(start?: string, end?: string) {
   return { startParts, endParts };
 }
 
+/** Page sizes above this are rejected; the logs are small enough to page. */
+const MAX_PAGE = 1000;
+
 function checkPaging(limit: number, offset: number, minMinutes?: number): void {
-  if (!Number.isInteger(limit) || limit < 0) {
-    throw new Error(`Invalid limit ${JSON.stringify(limit)}. Use a non-negative integer.`);
+  if (!Number.isInteger(limit) || limit < 0 || limit > MAX_PAGE) {
+    throw new Error(
+      `Invalid limit ${JSON.stringify(limit)}. Use an integer between 0 and ${MAX_PAGE}.`,
+    );
   }
   if (!Number.isInteger(offset) || offset < 0) {
     throw new Error(`Invalid offset ${JSON.stringify(offset)}. Use a non-negative integer.`);
@@ -136,7 +143,7 @@ async function main(): Promise<void> {
         return summarizeCalls(telephone, video, {
           start: startParts,
           end: endParts,
-          timezone,
+          timezone: timezone ?? "UTC",
           wantTelephone,
           wantVideo,
           groupBy: group_by,
@@ -159,7 +166,7 @@ async function main(): Promise<void> {
           .number()
           .optional()
           .describe("Keep calls lasting at least this many minutes."),
-        limit: z.number().int().default(50).describe("Max rows to return."),
+        limit: z.number().int().default(50).describe("Max rows to return (max 1000)."),
         offset: z.number().int().default(0).describe("Rows to skip before returning."),
       }),
       annotations: { readOnlyHint: true },
@@ -168,19 +175,25 @@ async function main(): Promise<void> {
       runTool(async () => {
         const { startParts, endParts } = parseRange(start, end);
         checkPaging(limit, offset, min_minutes);
-        const rows = await fetchCallLog(auth, cache, type);
-        return listCalls(
-          rows,
-          {
-            start: startParts,
-            end: endParts,
-            company: company?.toLowerCase(),
-            service: service?.toLowerCase(),
-            minMinutes: min_minutes,
-          },
-          limit,
-          offset,
-        );
+        const [rows, timezone] = await Promise.all([
+          fetchCallLog(auth, cache, type),
+          getAccountTimezone(auth, config.timezone),
+        ]);
+        return {
+          ...listCalls(
+            rows,
+            {
+              start: startParts,
+              end: endParts,
+              company: company?.toLowerCase(),
+              service: service?.toLowerCase(),
+              minMinutes: min_minutes,
+            },
+            limit,
+            offset,
+          ),
+          timezone: timezone ?? "UTC",
+        };
       }),
   );
 
@@ -205,11 +218,71 @@ async function main(): Promise<void> {
           getAccountTimezone(auth, config.timezone),
         ]);
         return {
-          timezone,
+          timezone: timezone ?? "UTC",
           months: months.filter(
             (m) => (from === undefined || m.month >= from) && (to === undefined || m.month <= to),
           ),
         };
+      }),
+  );
+
+  server.registerTool(
+    "globo_scheduled_calls",
+    {
+      title: "Scheduled calls",
+      description:
+        "Show scheduled interpreting appointments (upcoming and past) from the portal's per-user schedule: project number, type, company, language, date, time, status, and duration. Filter by status or type (case-insensitive exact match), company (substring), date range, or upcoming_only for what's next. Times are portal wall-clock with no stated timezone. For worked-call history use globo_list_calls; for totals use globo_call_summary.",
+      inputSchema: z.object({
+        ...dateRangeShape,
+        status: z
+          .string()
+          .optional()
+          .describe(
+            "Keep appointments with this status (case-insensitive exact match: completed, scheduled, cancelled, ...). Unknown values match nothing.",
+          ),
+        type: z
+          .string()
+          .optional()
+          .describe(
+            "Keep appointments of this type (case-insensitive exact match: Telephone, Video, Other - Video, ...).",
+          ),
+        company: z
+          .string()
+          .optional()
+          .describe("Keep appointments whose company contains this text."),
+        upcoming_only: z
+          .boolean()
+          .default(false)
+          .describe(
+            "Keep only appointments scheduled strictly after now (compared in your account timezone); Completed/Cancelled rows are dropped unless status is given explicitly.",
+          ),
+        limit: z.number().int().default(100).describe("Max rows to return (max 1000)."),
+        offset: z.number().int().default(0).describe("Rows to skip before returning."),
+      }),
+      annotations: { readOnlyHint: true },
+    },
+    async ({ start, end, status, type, company, upcoming_only, limit, offset }) =>
+      runTool(async () => {
+        const { startParts, endParts } = parseRange(start, end);
+        checkPaging(limit, offset);
+        const [rows, timezone] = await Promise.all([
+          fetchScheduledCalls(auth, cache),
+          getAccountTimezone(auth, config.timezone),
+        ]);
+        return listScheduledCalls(
+          rows,
+          {
+            start: startParts,
+            end: endParts,
+            status: status?.toLowerCase(),
+            type: type?.toLowerCase(),
+            company: company?.toLowerCase(),
+            upcomingOnly: upcoming_only,
+            timezone: timezone ?? undefined,
+          },
+          limit,
+          offset,
+        );
       }),
   );
 

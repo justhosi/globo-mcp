@@ -165,8 +165,9 @@ export class PortalAuth {
   /**
    * GET a portal path with a valid session, signing in first when needed. If
    * the response shows we are logged out, sign in ONCE and retry the request
-   * once. Concurrent callers that all find an expired session share the one
-   * re-login (via {@link login}) and each still retries its own request
+   * once. When several callers hit an expired session at once, {@link login}
+   * runs never two flows at once (a late caller joins the in-flight flow, or
+   * runs its own right after); each caller still retries its own request
    * exactly once.
    */
   async fetchWithAuth(path: string): Promise<FetchResult> {

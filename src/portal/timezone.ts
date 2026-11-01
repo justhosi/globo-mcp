@@ -10,13 +10,14 @@ import type { PortalAuth } from "../auth.js";
 import { getProfile } from "./profile.js";
 
 /** Per-session memo: the account never changes within a process. */
-const memo = new WeakMap<PortalAuth, Promise<string>>();
+const memo = new WeakMap<PortalAuth, Promise<string | null>>();
 
 /**
  * Resolve the account timezone: explicit override first (e.g.
- * `GLOBO_TIMEZONE`), then the profile page, finally `"UTC"` with a warning.
+ * `GLOBO_TIMEZONE`), then the profile page, finally `null` with a warning.
+ * Callers substitute `"UTC"` (or note the fallback) themselves.
  */
-export function getAccountTimezone(auth: PortalAuth, override?: string): Promise<string> {
+export function getAccountTimezone(auth: PortalAuth, override?: string): Promise<string | null> {
   const cleaned = override?.trim();
   if (cleaned) return Promise.resolve(cleaned);
   let pending = memo.get(auth);
@@ -30,7 +31,7 @@ export function getAccountTimezone(auth: PortalAuth, override?: string): Promise
   return pending;
 }
 
-function warnFallback(): string {
+function warnFallback(): null {
   console.error("[globo-mcp] warning: could not determine the account time zone; using UTC");
-  return "UTC";
+  return null;
 }

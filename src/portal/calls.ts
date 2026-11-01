@@ -5,10 +5,10 @@
  * timezone), `start`/`end` (`h:mm AM/PM`), `company`, `service`,
  * `call_unique_identifier`, `interpreter_minutes`, `hourly_pay_units`.
  *
- * Duration rule: `interpreter_minutes` is authoritative when it is a nonzero
+ * Duration rule: `interpreter_minutes` is authoritative when it is a positive
  * integer (the portal derives it from exact call timestamps, so it is usually
  * equal to — or one less than — the whole-minute start/end difference).
- * When it is 0 or missing, fall back to the whole-minute start/end
+ * When it is 0, negative, or missing, fall back to the whole-minute start/end
  * difference, treating `end < start` as a midnight crossing (+24h). The raw
  * value is always exposed as `portalMinutes` so callers can see both.
  *
@@ -162,12 +162,12 @@ function textField(row: Record<string, unknown>, key: string): string | null {
   return trimmed === "" ? null : trimmed;
 }
 
-/** Optional integer field: anything else becomes null. */
+/** Optional non-negative integer field: anything else becomes null. */
 function intField(row: Record<string, unknown>, key: string): number | null {
   const value = row[key];
-  if (typeof value === "number" && Number.isInteger(value)) return value;
+  if (typeof value === "number" && Number.isInteger(value) && value >= 0) return value;
   if (value === undefined || value === null) return null;
-  warn(`call row has non-integer ${JSON.stringify(key)}; treating as missing`);
+  warn(`call row has non-integer or negative ${JSON.stringify(key)}; treating as missing`);
   return null;
 }
 
@@ -227,9 +227,11 @@ export function parseCallLog(payload: unknown): DatedCall[] {
     const parsed = parseRow(row);
     if (parsed) rows.push(parsed);
   }
+  // Compare what the portal sent, not what survived parsing: one skipped
+  // malformed row must not emit a false "truncated" warning.
   const total = payload["recordsTotal"];
-  if (typeof total === "number" && rows.length < total) {
-    warn(`call log truncated by the portal (${rows.length} of ${total} rows)`);
+  if (typeof total === "number" && payload["data"].length < total) {
+    warn(`call log truncated by the portal (${payload["data"].length} of ${total} rows)`);
   }
   return rows;
 }
