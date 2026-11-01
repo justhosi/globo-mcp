@@ -2,8 +2,9 @@
  * Account timezone resolution.
  *
  * Portal dates are already rendered in the account's local timezone, so tools
- * never convert anything — but every analytics response echoes the timezone
- * so a model never has to guess which day boundary applies.
+ * never convert anything — but each analytics response echoes the zone, or
+ * `null` plus a note when the page states none, so a model never has to
+ * guess which day boundary applies.
  */
 
 import type { PortalAuth } from "../auth.js";

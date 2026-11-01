@@ -61,6 +61,17 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): GloboConfig {
         "the session cookie would travel in cleartext over http://.",
     );
   }
+  if (timezone !== undefined) {
+    try {
+      // Validates the IANA name now so a typo fails fast here instead of as
+      // a bare RangeError from Intl deep inside a tool call.
+      new Intl.DateTimeFormat(undefined, { timeZone: timezone });
+    } catch {
+      throw new Error(
+        `Invalid GLOBO_TIMEZONE ${JSON.stringify(timezone)}. It must be a valid IANA timezone name such as Europe/Istanbul.`,
+      );
+    }
+  }
 
   return {
     email,

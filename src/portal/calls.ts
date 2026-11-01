@@ -9,8 +9,9 @@
  * integer (the portal derives it from exact call timestamps, so it is usually
  * equal to — or one less than — the whole-minute start/end difference).
  * When it is 0, negative, or missing, fall back to the whole-minute start/end
- * difference, treating `end < start` as a midnight crossing (+24h). The raw
- * value is always exposed as `portalMinutes` so callers can see both.
+ * difference, treating `end < start` as a midnight crossing (+24h). The value
+ * is exposed as `portalMinutes` — null unless it is a non-negative integer —
+ * so callers can see both.
  *
  * Parsing is defensive: a malformed row is skipped with a stderr warning and
  * never fails the whole payload; bad scalar fields become `null`.
@@ -65,7 +66,7 @@ function warn(message: string): void {
   console.error(`[globo-mcp] warning: ${message}`);
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
@@ -151,7 +152,7 @@ export function parseDateInput(value: string, which: "start" | "end"): DayParts 
 }
 
 /** Optional text field: missing/empty/non-string becomes null. */
-function textField(row: Record<string, unknown>, key: string): string | null {
+export function textField(row: Record<string, unknown>, key: string): string | null {
   const value = row[key];
   if (value === undefined || value === null) return null;
   if (typeof value !== "string") {
@@ -163,11 +164,30 @@ function textField(row: Record<string, unknown>, key: string): string | null {
 }
 
 /** Optional non-negative integer field: anything else becomes null. */
-function intField(row: Record<string, unknown>, key: string): number | null {
+export function intField(row: Record<string, unknown>, key: string): number | null {
   const value = row[key];
   if (typeof value === "number" && Number.isInteger(value) && value >= 0) return value;
   if (value === undefined || value === null) return null;
   warn(`call row has non-integer or negative ${JSON.stringify(key)}; treating as missing`);
+  return null;
+}
+
+/**
+ * Hybrid duration shared by the call and assignment logs: a positive
+ * `interpreter_minutes` wins, otherwise the whole-minute clock difference
+ * (null when either endpoint is missing).
+ */
+export function resolveMinutes(
+  portalMinutes: number | null,
+  startMin: number | null,
+  endMin: number | null,
+): number | null {
+  if (portalMinutes !== null && portalMinutes !== 0) {
+    return portalMinutes;
+  }
+  if (startMin !== null && endMin !== null) {
+    return naiveMinutes(startMin, endMin);
+  }
   return null;
 }
 
@@ -185,12 +205,7 @@ function parseRow(row: unknown): DatedCall | null {
   const portalMinutes = intField(row, "interpreter_minutes");
   const startMin = parsePortalTime(row["start"]);
   const endMin = parsePortalTime(row["end"]);
-  let minutes: number | null = null;
-  if (portalMinutes !== null && portalMinutes !== 0) {
-    minutes = portalMinutes;
-  } else if (startMin !== null && endMin !== null) {
-    minutes = naiveMinutes(startMin, endMin);
-  }
+  const minutes = resolveMinutes(portalMinutes, startMin, endMin);
   if (minutes === null) {
     warn("call row has no usable duration; minutes will be null");
   }
@@ -265,6 +280,16 @@ export async function fetchCallLog(
   return rows;
 }
 
+/** Numeric day parts of a row whose date may be unknown (null when unknown). */
+export function datedParts(call: {
+  y: number | null;
+  m: number | null;
+  d: number | null;
+}): DayParts | null {
+  if (call.y === null || call.m === null || call.d === null) return null;
+  return { y: call.y, m: call.m, d: call.d };
+}
+
 /** Range + substring filters shared by the summary and list tools. */
 export interface CallFilter {
   start?: DayParts;
@@ -274,8 +299,18 @@ export interface CallFilter {
   minMinutes?: number;
 }
 
+/** Minimal dated-row shape for filtering (day parts always known here). */
+export interface FilterableCall {
+  y: number;
+  m: number;
+  d: number;
+  company: string | null;
+  service: string | null;
+  minutes: number | null;
+}
+
 /** True when a call falls inside the inclusive local-date range and matches. */
-export function matchesFilter(call: DatedCall, filter: CallFilter): boolean {
+export function matchesFilter(call: FilterableCall, filter: CallFilter): boolean {
   if (filter.start && dayKey(call) < dayKey(filter.start)) return false;
   if (filter.end && dayKey(call) > dayKey(filter.end)) return false;
   if (filter.company && !(call.company ?? "").toLowerCase().includes(filter.company)) return false;
@@ -319,7 +354,7 @@ export interface CallTotals {
   hours: number;
 }
 
-export function totalOf(calls: CallRecord[]): CallTotals {
+export function totalOf(calls: { minutes: number | null }[]): CallTotals {
   let minutes = 0;
   for (const call of calls) {
     if (call.minutes !== null) minutes += call.minutes;

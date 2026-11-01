@@ -122,6 +122,11 @@ function isRedirect(status: number): boolean {
   return status === 301 || status === 302 || status === 303 || status === 307 || status === 308;
 }
 
+/** Human-scale budget for timeout errors (`30000` → `"30s"`, `300` → `"300ms"`). */
+function formatBudget(timeoutMs: number): string {
+  return timeoutMs < 1000 ? `${timeoutMs}ms` : `${Math.round(timeoutMs / 1000)}s`;
+}
+
 /** Cookie-aware fetch client bound to one portal base URL. */
 export class HttpClient {
   readonly jar = new CookieJar();
@@ -133,19 +138,22 @@ export class HttpClient {
 
   /**
    * One `fetch` with the client timeout (fresh budget per redirect hop and
-   * per login step). An abort becomes a clear error naming the wait;
-   * anything else propagates untouched.
+   * per login step). A caller-supplied `signal` is composed with the timeout
+   * so neither is silently discarded. An abort becomes a clear error naming
+   * the wait; anything else propagates untouched.
    */
   private async timedFetch(url: string, init: RequestInit): Promise<Response> {
+    const timeout = AbortSignal.timeout(this.timeoutMs);
+    const signal = init.signal ? AbortSignal.any([init.signal, timeout]) : timeout;
     try {
-      return await fetch(url, { ...init, signal: AbortSignal.timeout(this.timeoutMs) });
+      return await fetch(url, { ...init, signal });
     } catch (error) {
       if (
         error instanceof DOMException &&
         (error.name === "AbortError" || error.name === "TimeoutError")
       ) {
         throw new Error(
-          `The portal did not respond within ${Math.round(this.timeoutMs / 1000)}s. ` +
+          `The portal did not respond within ${formatBudget(this.timeoutMs)}. ` +
             "The portal may be down or slow — try again later.",
         );
       }

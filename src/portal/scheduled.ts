@@ -32,7 +32,14 @@
 
 import type { PortalAuth } from "../auth.js";
 import type { TtlCache } from "./cache.js";
-import { dayKey, formatDay, parsePortalDate, parsePortalTime, type DayParts } from "./calls.js";
+import {
+  datedParts,
+  dayKey,
+  formatDay,
+  parsePortalDate,
+  parsePortalTime,
+  type DayParts,
+} from "./calls.js";
 
 const SCHEDULED_PATH = "/scheduled_calls";
 
@@ -109,12 +116,6 @@ function textCell(cell: string | undefined): string | null {
   if (cell === undefined) return null;
   const text = textOf(cell);
   return text === "" ? null : text;
-}
-
-/** Numeric date parts, or null when the row's date is unknown. */
-function datedParts(call: DatedScheduledCall): DayParts | null {
-  if (call.y === null || call.m === null || call.d === null) return null;
-  return { y: call.y, m: call.m, d: call.d };
 }
 
 /**

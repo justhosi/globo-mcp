@@ -24,8 +24,10 @@ import {
 import { TtlCache } from "./portal/cache.js";
 import { fetchMonthlyMinutes } from "./portal/monthly.js";
 import { fetchScheduledCalls, listScheduledCalls } from "./portal/scheduled.js";
+import { fetchAssignments, listAssignments } from "./portal/assignments.js";
 import { getAccountTimezone } from "./portal/timezone.js";
 import { getProfile } from "./portal/profile.js";
+import { checkPaging } from "./paging.js";
 
 const require = createRequire(import.meta.url);
 const pkg = require("../package.json") as unknown as { version: string };
@@ -70,25 +72,6 @@ function parseRange(start?: string, end?: string) {
     );
   }
   return { startParts, endParts };
-}
-
-/** Page sizes above this are rejected; the logs are small enough to page. */
-const MAX_PAGE = 1000;
-
-function checkPaging(limit: number, offset: number, minMinutes?: number): void {
-  if (!Number.isInteger(limit) || limit < 0 || limit > MAX_PAGE) {
-    throw new Error(
-      `Invalid limit ${JSON.stringify(limit)}. Use an integer between 0 and ${MAX_PAGE}.`,
-    );
-  }
-  if (!Number.isInteger(offset) || offset < 0) {
-    throw new Error(`Invalid offset ${JSON.stringify(offset)}. Use a non-negative integer.`);
-  }
-  if (minMinutes !== undefined && !(minMinutes >= 0)) {
-    throw new Error(
-      `Invalid min_minutes ${JSON.stringify(minMinutes)}. Use a non-negative number of minutes.`,
-    );
-  }
 }
 
 async function main(): Promise<void> {
@@ -283,6 +266,57 @@ async function main(): Promise<void> {
           limit,
           offset,
         );
+      }),
+  );
+
+  server.registerTool(
+    "globo_assignments",
+    {
+      title: "Assignments",
+      description:
+        "List the interpreter's assignment history (separate from ordinary telephone/video calls): date, start/end times, company, service, call id, durations in minutes, and any informational note the portal attached. Filter by date range, company or service name (case-insensitive substring), or a minimum duration; results are paginated with totals over all filtered rows. For ordinary calls use globo_list_calls.",
+      inputSchema: z.object({
+        ...dateRangeShape,
+        company: z
+          .string()
+          .optional()
+          .describe("Keep assignments whose company contains this text."),
+        service: z
+          .string()
+          .optional()
+          .describe("Keep assignments whose service contains this text."),
+        min_minutes: z
+          .number()
+          .optional()
+          .describe("Keep assignments lasting at least this many minutes."),
+        limit: z.number().int().default(50).describe("Max rows to return (max 1000)."),
+        offset: z.number().int().default(0).describe("Rows to skip before returning."),
+      }),
+      annotations: { readOnlyHint: true },
+    },
+    async ({ start, end, company, service, min_minutes, limit, offset }) =>
+      runTool(async () => {
+        const { startParts, endParts } = parseRange(start, end);
+        checkPaging(limit, offset, min_minutes);
+        const [rows, timezone] = await Promise.all([
+          fetchAssignments(auth, cache),
+          getAccountTimezone(auth, config.timezone),
+        ]);
+        return {
+          ...listAssignments(
+            rows,
+            {
+              start: startParts,
+              end: endParts,
+              company: company?.toLowerCase(),
+              service: service?.toLowerCase(),
+              minMinutes: min_minutes,
+            },
+            limit,
+            offset,
+          ),
+          timezone: timezone ?? "UTC",
+        };
       }),
   );
 

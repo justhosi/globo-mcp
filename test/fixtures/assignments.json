@@ -1,0 +1,76 @@
+{
+  "recordsTotal": 7,
+  "recordsFiltered": 7,
+  "data": [
+    {
+      "date": "06/10/2026",
+      "start": "bogus",
+      "end": "bogus",
+      "company": "Example Co",
+      "service": "Assignments",
+      "call_unique_identifier": "AR20260610007",
+      "interpreter_minutes": 0,
+      "hourly_pay_units": ""
+    },
+    {
+      "date": "06/15/2026",
+      "start": "01:00 PM",
+      "end": "01:30 PM",
+      "company": "Fabrikam",
+      "service": "Assignments",
+      "call_unique_identifier": "AR20260615005",
+      "interpreter_minutes": -5,
+      "hourly_pay_units": ""
+    },
+    {
+      "date": "06/20/2026",
+      "start": "09:00 AM",
+      "end": "09:30 AM",
+      "company": "Example Co",
+      "service": "Video Remote",
+      "call_unique_identifier": "AR20260620004",
+      "interpreter_minutes": 30,
+      "hourly_pay_units": "30 minutes of this call was serviced in the shift program"
+    },
+    {
+      "date": "06/25/2026",
+      "start": "02:10 PM",
+      "end": "02:29 PM",
+      "company": "Northwind",
+      "service": "Onsite",
+      "call_unique_identifier": "AR20260625003",
+      "interpreter_minutes": 0,
+      "hourly_pay_units": ""
+    },
+    {
+      "date": "06/28/2026",
+      "start": "10:00 AM",
+      "end": "10:47 AM",
+      "company": "Fabrikam",
+      "service": "Assignments",
+      "call_unique_identifier": "AR20260628002",
+      "interpreter_minutes": 47,
+      "hourly_pay_units": ""
+    },
+    {
+      "date": "06/30/2026",
+      "start": "06:53 PM",
+      "end": "07:19 PM",
+      "company": "Example Co",
+      "service": "Assignments",
+      "call_unique_identifier": "AR20260630001",
+      "interpreter_minutes": 25,
+      "hourly_pay_units": ""
+    },
+    {
+      "date": "someday",
+      "start": "11:00 AM",
+      "end": "11:50 AM",
+      "company": "Northwind",
+      "service": "Assignments",
+      "call_unique_identifier": "AR20260610006",
+      "interpreter_minutes": 50,
+      "hourly_pay_units": ""
+    }
+  ]
+}

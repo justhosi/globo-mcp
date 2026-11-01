@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { extractAuthenticityToken, extractState } from "../src/auth.js";
 import { loadConfig } from "../src/config.js";
 import { CookieJar, HttpClient, isLoggedOutRedirect, isLoginPageBody } from "../src/http.js";
+import { checkPaging, MAX_PAGE } from "../src/paging.js";
 import { parseProfile } from "../src/portal/profile.js";
 
 function fixture(name: string): string {
@@ -135,6 +136,40 @@ describe("loadConfig", () => {
       } as NodeJS.ProcessEnv),
     ).toThrow(/https/);
   });
+
+  it("accepts a valid GLOBO_TIMEZONE", () => {
+    const config = loadConfig({
+      GLOBO_EMAIL: "a@b.c",
+      GLOBO_PASSWORD: "secret",
+      GLOBO_TIMEZONE: "Europe/Istanbul",
+    } as NodeJS.ProcessEnv);
+    expect(config.timezone).toBe("Europe/Istanbul");
+  });
+
+  it("rejects an invalid GLOBO_TIMEZONE with an actionable message", () => {
+    expect(() =>
+      loadConfig({
+        GLOBO_EMAIL: "a@b.c",
+        GLOBO_PASSWORD: "secret",
+        GLOBO_TIMEZONE: "Bogus/Zone",
+      } as NodeJS.ProcessEnv),
+    ).toThrow(/GLOBO_TIMEZONE.*IANA/);
+  });
+});
+
+describe("checkPaging", () => {
+  it("accepts in-range paging", () => {
+    expect(() => checkPaging(50, 0)).not.toThrow();
+    expect(() => checkPaging(MAX_PAGE, 0, 0)).not.toThrow();
+  });
+
+  it("rejects out-of-range paging with an actionable message", () => {
+    expect(() => checkPaging(-1, 0)).toThrow(/between 0 and 1000/);
+    expect(() => checkPaging(MAX_PAGE + 1, 0)).toThrow(/between 0 and 1000/);
+    expect(() => checkPaging(1.5, 0)).toThrow(/Invalid limit/);
+    expect(() => checkPaging(10, -1)).toThrow(/Invalid offset/);
+    expect(() => checkPaging(10, 0, -1)).toThrow(/Invalid min_minutes/);
+  });
 });
 
 describe("parseProfile", () => {
@@ -258,5 +293,47 @@ describe("HttpClient redirect policy", () => {
       ),
     );
     await expect(client.get("/users/edit")).rejects.toThrow(/did not respond within/);
+  });
+
+  it("times out requestOnce too, reading sub-second budgets in ms", async () => {
+    const client = new HttpClient("https://globohq.com", 300);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        (_url: string, init: RequestInit) =>
+          new Promise<Response>((_resolve, reject) => {
+            init.signal?.addEventListener("abort", () => {
+              reject(new DOMException("The operation timed out.", "TimeoutError"));
+            });
+          }),
+      ),
+    );
+    await expect(client.requestOnce("https://globohq.com/x")).rejects.toThrow(
+      /did not respond within 300ms/,
+    );
+  });
+
+  it("composes a caller-supplied signal with the timeout instead of discarding it", async () => {
+    const client = new HttpClient("https://globohq.com", 30_000);
+    let captured: AbortSignal | undefined;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_url: string, init: RequestInit) => {
+        captured = init.signal ?? undefined;
+        if (init.signal?.aborted) {
+          throw new DOMException("This operation was aborted.", "AbortError");
+        }
+        return new Response("ok", { status: 200 });
+      }),
+    );
+    const caller = new AbortController().signal;
+    const result = await client.requestOnce("https://globohq.com/x", { signal: caller });
+    expect(result.text).toBe("ok");
+    expect(captured).toBeDefined();
+    expect(captured).not.toBe(caller);
+    expect(captured?.aborted).toBe(false);
+    await expect(
+      client.requestOnce("https://globohq.com/x", { signal: AbortSignal.abort() }),
+    ).rejects.toThrow(/did not respond within 30s/);
   });
 });
