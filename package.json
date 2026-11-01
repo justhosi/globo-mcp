@@ -1,0 +1,51 @@
+{
+  "name": "globo-mcp",
+  "version": "0.1.0",
+  "description": "Unofficial MCP server for the GLOBO Portal (globohq.com) interpreter work portal",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hossein-mohammadzadeh/globo-mcp.git"
+  },
+  "homepage": "https://github.com/hossein-mohammadzadeh/globo-mcp#readme",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "globo",
+    "interpreter",
+    "stdio"
+  ],
+  "type": "module",
+  "bin": {
+    "globo-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@typescript-eslint/eslint-plugin": "^8.46.0",
+    "@typescript-eslint/parser": "^8.46.0",
+    "eslint": "^9.39.2",
+    "prettier": "^3.7.4",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.2",
+    "vitest": "^5.0.5"
+  }
+}

@@ -1,0 +1,3194 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>GLOBO Portal</title>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	
+	  <link rel="apple-touch-icon" type="image/png" href="//d1cgjlloec4635.cloudfront.net/assets/apple-touch-icon-57x57-a473cbd802b2f1378da9a182018b42fc016ceba3a687eb56fec1ab9a7099346c.png" sizes="57x57" />
+  <link rel="apple-touch-icon" type="image/png" href="//d1cgjlloec4635.cloudfront.net/assets/apple-touch-icon-72x72-cd3aa67352b718a8a973182ffa0e745975243e28a87017cb1a64589bd5c06e25.png" sizes="72x72" />
+  <link rel="apple-touch-icon" type="image/png" href="//d1cgjlloec4635.cloudfront.net/assets/apple-touch-icon-76x76-2bd5764aaaee8a29843a0f9176f3af7d1085e8d4e51a02511e056b35111b3746.png" sizes="76x76" />
+  <link rel="apple-touch-icon" type="image/png" href="//d1cgjlloec4635.cloudfront.net/assets/apple-touch-icon-114x114-5e891eef2b1d9d705409391223956af0e3ccf3362986fb1a994ec67ed896a2a5.png" sizes="114x114" />
+  <link rel="apple-touch-icon" type="image/png" href="//d1cgjlloec4635.cloudfront.net/assets/apple-touch-icon-120x120-1bd240537c62f1b829b445fe9f7bdf2adebd547ca725732a25870c36290ba8f8.png" sizes="120x120" />
+  <link rel="apple-touch-icon" type="image/png" href="//d1cgjlloec4635.cloudfront.net/assets/apple-touch-icon-144x144-f809e7b2313771dc448a03b25d30a01032bb4d5404c6a4b8596a215b4c390b67.png" sizes="144x144" />
+  <link rel="apple-touch-icon" type="image/png" href="//d1cgjlloec4635.cloudfront.net/assets/apple-touch-icon-152x152-6629ce3d139096e027720134d0494b8303458ca5d5ce5fbc845f644f8d7b054a.png" sizes="152x152" />
+<link rel="apple-touch-icon" type="image/png" href="//d1cgjlloec4635.cloudfront.net/assets/apple-touch-icon-a473cbd802b2f1378da9a182018b42fc016ceba3a687eb56fec1ab9a7099346c.png" />
+<link rel="apple-touch-icon" type="image/png" href="//d1cgjlloec4635.cloudfront.net/assets/apple-touch-icon-precomposed-a473cbd802b2f1378da9a182018b42fc016ceba3a687eb56fec1ab9a7099346c.png" />
+<link rel="shortcut icon" type="image/x-icon" href="//d1cgjlloec4635.cloudfront.net/assets/favicon-c1a442241cbc1a17248f64776b0d23d21a826b7152af3997aa0ce6ff333b18fa.ico" />
+	<meta name="csp-nonce" content="QMETG+1AnOqyMfzg/tk21Q=="/>
+	<script nonce="QMETG+1AnOqyMfzg/tk21Q==">
+//<![CDATA[
+
+		(function() {
+			var nonceMeta = document.querySelector('meta[name="csp-nonce"]');
+			if (!nonceMeta) return;
+			var nonceValue = nonceMeta.getAttribute('content');
+			var debug = false;
+
+			var KNOWN_LIBS = [
+				{ pattern: /sweetalert2/i,          label: 'SweetAlert2'      },
+				{ pattern: /\bvis\b/i,               label: 'vis.js'           },
+				{ pattern: /sparkline|initStyles/i,  label: 'jQuery Sparkline' }
+			];
+
+			function detectLib(stack) {
+				for (var i = 0; i < KNOWN_LIBS.length; i++) {
+					if (KNOWN_LIBS[i].pattern.test(stack)) return KNOWN_LIBS[i];
+				}
+				return null;
+			}
+
+			function applyNonce(el, source) {
+				var stack = new Error().stack || '';
+				var lib = detectLib(stack);
+				if (!lib) return;
+
+				el.setAttribute('nonce', nonceValue);
+				el.nonce = nonceValue;
+
+				if (debug) {
+					var frames = stack.split('\n').slice(3, 6);
+					console.groupCollapsed('[CSP nonce] Nonce granted to ' + lib.label + ' via ' + source);
+					frames.forEach(function(f) {
+						var m = f.trim().match(/at (?:([\w$.]+)\s+\()?.*?([\w.-]+\.js):(\d+)/);
+						if (m) console.debug((m[1] || 'anonymous') + ' — ' + m[2] + ':' + m[3]);
+					});
+					console.groupEnd();
+				}
+			}
+
+			var _createElement = document.createElement.bind(document);
+			document.createElement = function(tag, options) {
+				var el = _createElement(tag, options);
+				if (typeof tag === 'string' && tag.toLowerCase() === 'style') {
+					applyNonce(el, 'createElement');
+				}
+				return el;
+			};
+
+			var _cloneNode = Element.prototype.cloneNode;
+			Element.prototype.cloneNode = function(deep) {
+				var el = _cloneNode.call(this, deep);
+				if (el.tagName && el.tagName.toLowerCase() === 'style') {
+					applyNonce(el, 'cloneNode');
+				}
+				return el;
+			};
+		})();
+
+//]]>
+</script>	<script nonce="QMETG+1AnOqyMfzg/tk21Q==">
+//<![CDATA[
+ FontAwesomeConfig = {searchPseudoElements: true}; 
+//]]>
+</script>
+	<link rel="stylesheet" href="//d1cgjlloec4635.cloudfront.net/assets/application-20677d49faeb89201244c5f1fb0474a02b7bdd04f2b9a39cfac8802e98392508.css" media="all" />
+	
+	<script nonce="QMETG+1AnOqyMfzg/tk21Q==">
+//<![CDATA[
+window.GLOBO = {"env":{"development":false,"production":true,"staging":false,"qa":false,"demo":false,"sandbox":false,"test":false},"config":{"honeybadger_api_key":"987f2b3c","honeybadger_env":"production","twilio_from":"+12679156050","pusher_key":"49334bad5aa605b31b31","pusher_cluster":"mt1","post_call_feedback_timeout":10000,"post_call_feedback_enabled":true,"vri_connect_retries":1,"interpreter_connect_video_call_timeout_seconds":30,"virtual_background_assets_path":"/admin/virtual_backgrounds/models/3.1.0"},"images":{"thumbs_up":"//d1cgjlloec4635.cloudfront.net/assets/thumbs-up-97895513732f97a3dadbaa04c8d890d52447d61821c428fbfb9e5ce3b648edfa.png","thumbs_down":"//d1cgjlloec4635.cloudfront.net/assets/thumbs-down-4c477cadd12488bb356f2d02c3c66a1bcd75c7b8ced3387e3b958860d7369821.png","copilot_logo":"//d1cgjlloec4635.cloudfront.net/assets/interpreter-copilot-logo-0c89fe4b147032ea094a8c774004207e27c032b831d69293f6bd344c2ed1c623.png","feedback_positive":"//d1cgjlloec4635.cloudfront.net/assets/feedback-positive-green-1x-62472661ab67ee9c4751a8815cca8d3091d7fb5c8ed8e1549c71a20e909e8f9a.png","feedback_negative":"//d1cgjlloec4635.cloudfront.net/assets/feedback-negative-orange-1x-2d4d5df2e2ce886a4c85a7bc0c53966c370170b4f5bfc4f6600822f7d8db31f1.png"},"audio":{"ding":"//d1cgjlloec4635.cloudfront.net/assets/ding-776f5ce8d69d28cb163b5b1bdb149de36bea8a33560d56a55326d5ba9b7e1f63.wav","incoming":"//d1cgjlloec4635.cloudfront.net/assets/incoming-8d1700a9c28d9c077d08f7b70ce475c274b2990a4bced1d44dc25655b5c85c8e.wav","disconnect":"//d1cgjlloec4635.cloudfront.net/assets/disconnect-18572e3d78dd155406a501fceed4d98f4c844f7ef4fffa3541f4a7c11d6cd460.mp3","bell_ding_muted":"//d1cgjlloec4635.cloudfront.net/assets/bell_ding_muted_lo-013a5d59da38d88e71662483841f962312c39f9abb6308318ac4f72c5dfcb95b.m4a"},"assets":{"jquery_reject_chrome":"//d1cgjlloec4635.cloudfront.net/assets/jquery-reject/browser_chrome-8b7ccc062bba7d9a89725d20e8c965767017d132f4bc11676d83100c766eca1c.gif","jquery_reject_firefox":"//d1cgjlloec4635.cloudfront.net/assets/jquery-reject/browser_firefox-ba9fe93d6d374348a596e4cca1c93e8a41ea421b52d2e376e75aa4c511e2ee7b.gif","jquery_reject_safari":"//d1cgjlloec4635.cloudfront.net/assets/jquery-reject/browser_safari-b169980edf1577711994dadb61a0e3aba84a1fd714e991831f21b0c0af3b6658.gif","jquery_reject_opera":"//d1cgjlloec4635.cloudfront.net/assets/jquery-reject/browser_opera-e6d416063b88ba4428082206496eec17987b85fd8385d67dffe073587e4e2993.gif","jquery_reject_msie":"//d1cgjlloec4635.cloudfront.net/assets/jquery-reject/browser_msie-28822dfd14ec2a30537fb3462fdf81354abca67f698b8e405f62db1e62738215.gif","jquery_reject_background":"//d1cgjlloec4635.cloudfront.net/assets/jquery-reject/background_browser-cf2ea6c3fe6939ea73b23fd00d651a8a511f46165f312f113bdc61c5ee37319e.gif"},"constants":{"twilio_jwt_token_expired":20104,"user_mobile_identity_prefix":"mobile_user_","call_question_answer_text_limit":481},"pusher":{"AgentDashboard":{"events":{"ADD_SKILL":"add-skill","REMOVE_SKILL":"remove-skill","CALL_INVITE":"audio-call-invite","CALL_UPDATE":"active-call-update","CALL_REMOVAL":"active-call-removal","AGENT_CALL_ANSWERED":"agent-call-answered","AGENT_CALL_RECONNECTED":"agent-call-reconnected","RESOURCE_CALL_ANSWERED":"resource-call-answered","RESOURCE_CALL_COMPLETED":"resource-call-completed","RESOURCE_CALL_COMPLETED_WITH_ERROR":"resource-call-completed-with-error","RESOURCE_CALL_REQUEUED":"resource-call-requeued","RESOURCE_PENDING_CALL_ENDED":"resource-pending-call-ended","INTERNAL_EMPLOYEE_CALL_RINGING":"internal-employee-call-ringing","INTERNAL_EMPLOYEE_CALL_NO_ANSWER":"internal-employee-call-no-answer","INTERNAL_EMPLOYEE_CALL_IN_PROGRESS":"internal-employee-call-in-progress","INTERNAL_EMPLOYEE_CALL_INITIATED":"internal-employee-call-initiated","INTERNAL_EMPLOYEE_CALL_COMPLETED":"internal-employee-call-completed","THIRD_PARTY_DIAL_OUT_CALL_CONNECTED":"third-party-dial-out-call-connected","THIRD_PARTY_DIAL_OUT_CALL_COMPLETED":"third-party-dial-out-call-completed","INTERPRETER_UPDATE":"interpreter-update","RESOURCE_UPDATE":"resource-update","RESOURCE_AVAILABLE":"resource-available","RESOURCE_UNAVAILABLE":"resource-unavailable","RESOURCE_AVAILABILITY_UPDATED":"resource-availability-updated","OFF_PLATFORM_RESOURCE_CALL_INITIATED":"off-platform-resource-call-initiated","INTERPRETER_PRE_QUEUE_STARTED":"interpreter-pre-queue-started","UPDATE_INTERPRETER":"update-interpreter"},"channels":{"CHANNEL_PREFIX":"audio-dashboard-channel-","INTERPRETER_LIST":"agent-dashboard-interpreter-list"}},"AgentManagementDashboard":{"events":{"UPDATE":"update"},"channels":{"MAIN":"amd-info"}},"Availability":{"channels":{"AVAILABILITY_PREFIX":"availability-channel"},"events":{"RELOAD":"reload-availability","UPDATE":"update-availability"}},"VideoDashboard":{"events":{"INVITE":"video-call-invite","INVITE_TIMEOUT":"invitation-timeout","CLIENT_CALL_TIMEOUT":"client-call-timeout","FORCE_AUDIO_ROLLOVER":"video-call-force-audio-rollover","INTERPRETER_CONNECT_FAILED":"interpreter-connect-failed","FORCE_END":"force-end-video-call","NOTIFICATION":"notification"},"channels":{"CHANNEL_PREFIX":"video-dashboard-channel-"}},"VideoAgentDashboard":{"events":{"UPDATE_VIDEO_INTERPRETER":"update-interpreter"},"channels":{"INTERPRETER_LIST":"video-agent-dashboard-interpreter-list"}},"scheduled_calls":{"channels":{"ROOM_PREFIX":"scheduled-call-room-","DASHBOARD":"scheduled-call-dashboard"},"events":{"PARTICIPANT_JOINED_ROOM":"participant-joined","SCHEDULED_CALL_UPDATE":"scheduled-call-update","PARTICIPANT_UPDATE":"participant-update"}},"schedules":{"channels":{"HOURLY":"schedules-hourly","STANDBY":"schedules-standby"},"events":{"UPDATE_HOURLY_SCHEDULE":"update-hourly-schedule","REMOVE_HOURLY_SCHEDULE":"remove-hourly-schedule","REMOVE_STANDBY_SCHEDULE":"remove-standby-schedule","UPDATE_STANDBY_SCHEDULE":"update-standby-schedule"}},"ScheduledAssignmentDashboard":{"channels":{"DASHBOARD":"scheduled-assignment-dashboard"},"events":{"RELOAD":"reload"}},"LinguistDashboard":{"events":{"UPDATE_DAILY_VIDEO_CALLS":"update-daily-video-calls","UPDATE_DAILY_CALLS":"update-daily-calls","UPDATE_DAILY_ASSIGNMENTS":"update-daily-assignments","UPDATE_RECENT_JOB":"update-recent-job","UPDATE_ASSIGNMENT":"update-assignment","REMOVE_ASSIGNMENT":"remove-assignment","CLOSE_ASSIGNMENT_MODAL":"close-assignment-modal","ADD_TRANSCRIPT":"add-transcript"},"channels":{"ASSIGNMENTS":"linguist-dashboard-assignments","RECENT_JOBS":"linguist-dashboard-recent-jobs","STATS":"linguist-dashboard-stats","TRANSCRIPTIONS":"linguist-dashboard-transcriptions"}},"ArtificialIntelligenceInterpretingDashboard":{"events":{"NEW_MESSAGE":"new-message","SEGMENT_COUNT_INCREASE":"segment-count-increase"},"channels":{"DASHBOARD":"artificial-intelligence-interpreting-dashboard","SESSION_CHANNEL_PREFIX":"artificial-intelligence-interpreting-dashboard-session-"}},"charts":{"channels":{"DATA":"charts-data"},"events":{"MONTHLY_MINUTES":"monthly-minutes"}},"TelephoneInterpreting":{"events":{"ON_AUDIO_RESOURCE_JOINED":"ON_AUDIO_RESOURCE_JOINED"}}},"routes":{"get_token_video_interpretings":"/video_interpreting/get_token"},"models":{"Call":"Call","VideoCall":"VideoCall","ScheduledTelephoneInterpretingCall":"ScheduledTelephoneInterpretingCall","ScheduledVideoInterpretingCall":"ScheduledVideoInterpretingCall","Datasource":"Datasource","User":"User","SingleLineQuestion":"SingleLineQuestion","DTMFSingleLineQuestion":"DTMFSingleLineQuestion","DTMFMultipleChoiceQuestion":"DTMFMultipleChoiceQuestion","MultipleLineQuestion":"MultipleLineQuestion","MultipleChoiceQuestion":"MultipleChoiceQuestion"},"ServiceType":{"ti":"TelephoneInterpretingService","vri":"VideoInterpretingService","connections":"AssignmentRouterService"},"lookups":{"CallEndReason":{"all":[{"id":47,"name":"Rejected"},{"id":48,"name":"Roll Over to Audio: Call Time Out"},{"id":49,"name":"Roll Over to Audio: No Interpreters Online"},{"id":50,"name":"Roll Over to Audio: User Escalation"},{"id":51,"name":"Roll Over to Audio: Interjection"},{"id":5,"name":"No Fill"},{"id":15,"name":"Caller Requested"},{"id":25,"name":"No Audio / Quality Issues"},{"id":35,"name":"Onsite Request"},{"id":45,"name":"Customer Service Request"},{"id":46,"name":"Hold"},{"id":52,"name":"Failed"}],"agent_types":[{"id":47,"name":"Rejected"},{"id":48,"name":"Roll Over to Audio: Call Time Out"},{"id":49,"name":"Roll Over to Audio: No Interpreters Online"},{"id":50,"name":"Roll Over to Audio: User Escalation"},{"id":51,"name":"Roll Over to Audio: Interjection"},{"id":5,"name":"No Fill"},{"id":15,"name":"Caller Requested"},{"id":25,"name":"No Audio / Quality Issues"},{"id":35,"name":"Onsite Request"},{"id":45,"name":"Customer Service Request"},{"id":52,"name":"Failed"}]},"CallRequeueReason":{"all":[{"id":7,"name":"Customer Service"},{"id":17,"name":"New Interpreter"},{"id":18,"name":"OffPlatform Rejected"},{"id":19,"name":"Manager Requested"},{"id":20,"name":"Personal Emergency/Situation"},{"id":21,"name":"Audio/Video/Technology Issues"},{"id":22,"name":"Upset LEP or Provider, interpreter unable to handle"},{"id":23,"name":"Female Interpreter Requested"},{"id":24,"name":"Male Interpreter Requested"},{"id":25,"name":"Unqualified for subject matter in this call (Interpreter Recusal)"},{"id":26,"name":"Different Language - unable to find in list"},{"id":27,"name":"Other"}],"new_interpreter":{"id":17,"name":"New Interpreter"},"linguist_types":[{"id":19,"name":"Manager Requested"},{"id":20,"name":"Personal Emergency/Situation"},{"id":21,"name":"Audio/Video/Technology Issues"},{"id":22,"name":"Upset LEP or Provider, interpreter unable to handle"},{"id":23,"name":"Female Interpreter Requested"},{"id":24,"name":"Male Interpreter Requested"},{"id":25,"name":"Unqualified for subject matter in this call (Interpreter Recusal)"},{"id":26,"name":"Different Language - unable to find in list"},{"id":27,"name":"Other"}]},"StructuredPayload":{"osf_video_visit":{"id":10,"name":"OSF Video Visit"},"video_call_invite":{"id":1,"name":"Video Call Invite"},"twilio_telehealth_invite":{"id":2,"name":"Twilio Telehealth Invite"},"vonage_video_invite":{"id":4,"name":"Vonage Video Invite"},"vonage_video_embed_invite":{"id":5,"name":"Vonage Video Embed Invite"},"cisco_webex_invite":{"id":6,"name":"Cisco Webex Invite"},"cisco_webex_embed_invite":{"id":7,"name":"Cisco Webex Embed Invite"},"zoom_invite":{"id":8,"name":"Zoom Invite"},"zoom_embed_invite":{"id":9,"name":"Zoom Embed Invite"},"doxy_me_invite":{"id":3,"name":"Doxy.me Invite"}},"AssignmentRequestStatus":{"resource_assigned":{"id":897,"name":"Resource Assigned"},"assignment_started":{"id":898,"name":"Assignment Started"},"assignment_completed":{"id":899,"name":"Assignment Completed"}},"AssignmentInviteRequestStatus":{"invited":{"id":889,"name":"Invited"}},"ScheduledCallRequestStatus":{"completed_status":{"id":855,"name":"Completed"}},"ScheduledCallParticipantStatus":{"participant_outbound":{"id":31,"name":"ParticipantOutbound"},"manager_outbound":{"id":41,"name":"ManagerOutbound"}},"Company":{"default_company":{"id":11751,"name":"GLOBO Default (DO NOT DELETE)"}},"CallStatus":{"new_call":{"id":1,"name":"New"},"off_platform_resource_in_call":{"id":5632,"name":"OffPlatformResourceInCall"},"customer_service":{"id":5767,"name":"CustomerService"},"customer_service_pending":{"id":5757,"name":"CustomerServicePending"},"agent_pending":{"id":2296,"name":"AgentPending"},"resource_pending":{"id":5635,"name":"ResourcePending"},"off_platform_in_call":{"id":5621,"name":"OffPlatformInCall"},"interpreter":{"id":1531,"name":"Interpreter"},"interpreter_pending":{"id":1276,"name":"InterpreterPending"},"off_platform":{"id":3061,"name":"OffPlatform"},"resource":{"id":5645,"name":"Resource"},"resource_in_call":{"id":5675,"name":"ResourceInCall"},"interpreter_in_call":{"id":4081,"name":"InterpreterInCall"},"agent":{"id":1021,"name":"Agent"},"completed":{"id":2041,"name":"Completed"},"off_platform_outbound":{"id":5622,"name":"OffPlatformOutbound"},"hold_state_ids":[2296,1276,3061,5757]},"VideoCallStatus":{"new_call":{"id":5,"name":"New"},"unanswered":{"id":85,"name":"Unanswered"},"completed":{"id":35,"name":"Completed"}},"UserCallRole":{"off_platform_call_role_ids":[104,67,77,42]},"Department":{"all":[{"id":5,"name":"Engineering"},{"id":15,"name":"Data Analytics"},{"id":19,"name":"Sales "},{"id":29,"name":"Talent"},{"id":39,"name":"Marketing "},{"id":49,"name":"Client Services "},{"id":59,"name":"Translation "},{"id":69,"name":"Onsite "},{"id":79,"name":"Call Center "},{"id":89,"name":"Operations "},{"id":109,"name":"Quality "},{"id":110,"name":"Customer Success"},{"id":99,"name":"Accounts Receivable"},{"id":111,"name":"Accounts Payable"},{"id":112,"name":"Scheduled Services"},{"id":113,"name":"Language Concierge"}]},"Language":{"to_skip_audio_rollover":[{"id":46511,"name":"American Sign Language"},{"id":50615,"name":"Test Call"}],"test_call":{"id":50615,"name":"Test Call"},"ASL":{"id":46511,"name":"American Sign Language"}},"ProbationCategory":{"probation_pass":{"id":12},"qa_review":{"id":22}},"ScheduledCallType":{"telephone":{"id":2,"name":"Telephone"},"video":{"id":1,"name":"Video"},"other_audio":{"id":4,"name":"Other - Audio"},"other_video":{"id":3,"name":"Other - Video"}}},"Charts":{"Size":{"SMALL":1,"MEDIUM":2,"LARGE":3},"Themes":{"DEFAULT":0,"GLOBO":1,"BLUE":2}},"AgentDashboard":{"ErrorCodes":{"CALL_CANNOT_BE_ANSWERED":100,"CALL_ALREADY_ANSWERED":101}}};
+//]]>
+</script>
+	<script src="//d1cgjlloec4635.cloudfront.net/assets/GLOBO-cd934d560acf56c938dd833ceb91a58ed09a7f2ce60ec9552771998dee86ba94.js" nonce="QMETG+1AnOqyMfzg/tk21Q=="></script>
+
+
+  <script src="//d1cgjlloec4635.cloudfront.net/assets/globo-pack-feb919d3fb7400e5233a02c15ca1a36652fac17bb559a97b299d078aa9940ae7.js" nonce="QMETG+1AnOqyMfzg/tk21Q=="></script>
+  <script src="//d1cgjlloec4635.cloudfront.net/assets/application-0f069636712b7098e8d0881b934ca403efd87a094ab6f9bbcaa391875a8837a9.js" nonce="QMETG+1AnOqyMfzg/tk21Q=="></script>
+  <script src="//d1cgjlloec4635.cloudfront.net/assets/honeybadger_config-59b743fccf66deeb349f6ab7b1ad73993fd07b79781a31461bbd6b2b129321f6.js" nonce="QMETG+1AnOqyMfzg/tk21Q==" defer="defer"></script>
+  <script src="//d1cgjlloec4635.cloudfront.net/assets/utils-5a0d21c7093d7df6b2388ce60c8ffb64dd09b38cd5c2a2d990b21aa437bf9928.js" nonce="QMETG+1AnOqyMfzg/tk21Q=="></script>
+  
+
+    <script src="//d1cgjlloec4635.cloudfront.net/assets/globo-react-pack-4cfc20c44ce663f84201e581aed12f728e315e4acd9c131c2422db4d40533ea8.js" nonce="QMETG+1AnOqyMfzg/tk21Q==" defer="defer"></script>
+
+
+
+  <meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="TESTCSRFTOKEN" />
+	<!-- http://speed-test.cfapps.io/ -->
+
+<script nonce="QMETG+1AnOqyMfzg/tk21Q==">
+//<![CDATA[
+
+  var _user = "user@example.com";
+  var _currentPage = "/users/edit";
+  var _logLocation = "https://globohq.com/console_logs";
+
+  $(document).ready(function(){
+    console.log("document ready console_log");
+    var _log = console.log;
+    var _error = console.error;
+    var _warn = console.warn;
+
+    console.error = function(errMessage){
+        _sendConsoleMessage(errMessage, 'Error');
+       _error.apply(console,arguments);
+    };
+
+    console.log = function(logMessage){
+        _sendConsoleMessage(logMessage, 'Log');
+        _log.apply(console,arguments);
+    };
+
+    console.warn = function(warnMessage){
+       _sendConsoleMessage(warnMessage, 'Warning');
+       _warn.apply(console,arguments);
+    };
+
+    function _sendConsoleMessage(message, message_severity){
+      return; 
+      
+      $.ajax({
+        method: "POST",
+        async: true,
+        url: _logLocation,
+        data: JSON.stringify({ msg: message, severity: message_severity, page: _currentPage, user: _user })
+      });
+      // }).fail(function(jqXHR, textStatus) {
+      //   console.log("Error logging to server : " + textStatus);
+      // });
+    }
+    
+  });
+
+//]]>
+</script>
+		<script nonce="QMETG+1AnOqyMfzg/tk21Q=="  src="https://bp-cdn.dev.helloglobo.com/js/client.min.js" async=&#39;async&#39;></script>
+
+
+
+
+
+	
+
+</head>
+
+<body class="">
+	<link rel="preconnect" href="https://globohq.com">
+	<link rel="preconnect" href="https://d3858hfkbmzrt.cloudfront.net">
+	<link rel="preconnect" href="https://bp-cdn.dev.helloglobo.com">
+	<link rel="preconnect" href="https://media.twiliocdn.com">
+	<link rel="preconnect" href="https:/fonts.googleapis.com">
+
+	<script nonce="QMETG+1AnOqyMfzg/tk21Q==">
+//<![CDATA[
+
+			window.onLoaded(function() {
+		Honeybadger.setContext({
+			user_id: 100001
+		});
+
+		Honeybadger.setContext({
+			location: document.location,
+			cookie: document.cookie,
+		});
+
+		Honeybadger.beforeNotify(function (notice) {
+			if (!notice) return;
+			if (!notice.context) return;
+			if (window.stack) notice.context.custom_stack = window.stack();
+			if (notice.stack) notice.context.hb_stack = notice.stack;
+		});
+	}, true);
+
+		window.GLOBO_REVISION = "31f542548740d25e1b40c30d8c981a115d58430c";
+window.setupClipboard = function (selector, copiedText, successText) {
+	if (!selector) selector = '.clipboard-copy';
+	var cp = new ClipboardJS(selector, {
+		text: function (trigger) {
+			var innerText = trigger.innerHTML.trim();
+			copiedText = $(trigger).attr('data-clipboard-text') || innerText;
+			return copiedText;
+		}
+	});
+
+	cp.on('success', function (e) {
+		copiedText = copiedText || e.text;
+		successText = successText || $(selector).data('clipboard-success') || 'The following text was copied to your clipboard ' + e.text;
+    // TODO: update toast library or adapt custom methods so iconClass works fine again.
+		//		window.toastS(successText, null, { iconClass: 'fal fa-copy fa-sm' });
+		window.toastS(successText);
+
+		e.clearSelection();
+	});
+
+	return cp;
+
+};
+
+window.setupTooltips = function (selector, title) {
+	if (!selector) selector = '[data-bs-toggle="tooltip"]';
+	var className = 'hint--top';
+	$(selector).removeClass(className).addClass(className).each(function () {
+		var tt = title || $(this).attr(title);
+		$(this).attr('aria-label', tt);
+	})
+};
+
+window.setupAutoScrollOnClick = function (selector) {
+	if (!selector) selector = '[data-scroll-on-click]';
+
+	$(selector).on('click', function (e) {
+		var target = $(this).data('scroll-on-click');
+		var container = $(this).data('scroll-container') || 'html, body';
+
+		var currentRef = $(this).attr('href');
+		if (!currentRef) $(this).attr('href', target);
+
+		if (window.scrollToElementInTarget) {
+			e.preventDefault();
+			window.scrollToElementInTarget(container, target, 10);
+		}
+	});
+};
+
+if (window.onLoaded) {
+	window.onLoaded(function () {
+		window.setupClipboard();
+		window.setupTooltips();
+		window.setupAutoScrollOnClick();
+		if (false) {
+        window.listenToAjaxCalls();
+    }
+	}, true);
+}
+
+		
+window.GLOBO_LANGUAGE_SEARCH_IMPROVEMENTS = false;
+
+window.setupCheckboxes = function (selector) {
+	if (!selector) selector = '.i-checks';
+	$(selector).iCheck({
+		checkboxClass: 'icheckbox_square-orange',
+		radioClass: 'iradio_square-orange',
+	}).on('ifToggled', function (e) {
+		$(this).trigger("change", e.target.checked);
+		try {
+			Object.keys(e.target).find(function(key){
+				// TODO this is sketchy and may break again in a future react upgrade - jquery+react is no good :(
+				if(key.indexOf("__reactProps$") >= 0) {
+					if(e.target[key]['onChange']) e.target[key]['onChange']();
+				}
+			});
+		} catch (err) {
+			console.error('window.setupCheckboxes.on','ifToggled', 'error trying to trigger react onChange', err, e.target)
+		}
+	});
+};
+
+
+window.setupToggleSwitches = function (selector) {
+	// Removed: bootstrap-switch initialization - now using Bootstrap 5 native form-switches
+
+	// Note: Bootstrap 5 form-switches work natively without JavaScript initialization
+	// Event handlers should be attached directly to individual switches as needed
+}
+
+window.setupDatetimePickers = function (selector, format) {
+	if (!selector) selector = '.datetimepicker, .datetime-picker';
+	if (!format) format = 'L LT'
+
+	let options = {sideBySide: true};
+	if (format) {
+		options.format = format;
+	}
+	$(selector).datetimepicker(options);
+	$(selector).attr('autocomplete', 'off');
+}
+
+
+
+window.setupTimePickers = function (selector, format, extra) {
+	if (!selector) selector = '.timepicker, .time-picker';
+	if (!format) format = 'LT'
+
+	extra = extra || {};
+
+	$(selector).datetimepicker(Object.assign({format: format, widgetPositioning: { vertical: 'bottom' }}, extra));
+	$(selector).attr('autocomplete', 'off');
+}
+
+window.setupDatePickers = function (selector, format) {
+	if (!selector) selector = '.datepicker, .date-picker';
+	if (!format) format = 'L'
+
+	$(selector).datetimepicker({format: format, widgetPositioning: { vertical: 'bottom' }});
+	$(selector).attr('autocomplete', 'off');
+}
+
+window.setupRequestButtons = function (selector) {
+	if (!selector) selector = '.btn-request';
+	$(selector).attr('data-disable-with', 'Please Wait...');
+	// Setup request anchors
+	var anchorSelector = 'a' + selector;
+
+	var ajaxSendHandler = function () {
+		$(this).attr('disabled', true);
+	};
+
+	var ajaxErrorHandler = function (event, response) {
+		console.log('window.setupRequestButtons', 'ajax:error', this, arguments);
+		if (response && response.responseText) {
+			var json = response.responseJSON
+			if (!json) json = JSON.parse(response.responseText);
+			if (json && json.message) {
+				window.error(json.message);
+			}
+
+		}
+	};
+
+	var ajaxCompleteHandler = function () {
+		$(this).attr('disabled', null);
+	};
+
+	$(anchorSelector).unbind('ajax:send', ajaxSendHandler);
+	$(anchorSelector).unbind('ajax:error', ajaxErrorHandler);
+	$(anchorSelector).unbind('ajax:complete', ajaxCompleteHandler);
+
+	$(anchorSelector).on('ajax:send', ajaxSendHandler);
+	$(anchorSelector).on('ajax:error', ajaxErrorHandler);
+	$(anchorSelector).on('ajax:complete', ajaxCompleteHandler);
+}
+
+window.resetSelects = function (selector, width, options) {
+	if (!selector) selector = '.auto-select2';
+	if (!width) width = '100%';
+	if (!options) options = {};
+
+	$(selector).select2('val', '');
+	$(selector).select2('destroy');
+	try {
+		window.setupSelects(selector, width, options);
+	} catch (e) {
+
+	}
+};
+
+// Shared Select2 helpers (avoid repeating inline JS across views/partials)
+// ----------------------------------------------------------------------
+// Note: Select2 hides the original <select>, so default label->focus behavior breaks.
+window.bindSelect2LabelClick = function (selectEl) {
+	try {
+		const el = (selectEl && selectEl.jquery) ? selectEl.get(0) : selectEl;
+		if (!el || !el.id) return;
+
+		const labelEl = document.querySelector(`label[for="${el.id}"]`);
+		if (!labelEl) return;
+
+		// Avoid rebinding if setupSelects runs multiple times.
+		if (labelEl.dataset && labelEl.dataset.select2LabelBound === 'true') return;
+		if (labelEl.dataset) labelEl.dataset.select2LabelBound = 'true';
+
+		labelEl.addEventListener('click', function (e) {
+			e.preventDefault();
+			try {
+				$(el).select2('open');
+			} catch (_err) {
+				// Fallback: focus the rendered selection if Select2 isn't ready.
+				const rendered = document.querySelector(`#select2-${el.id}-container`);
+				if (rendered && typeof rendered.focus === 'function') rendered.focus();
+			}
+		});
+	} catch (e) {
+		console.error('window.bindSelect2LabelClick error', e);
+	}
+};
+
+// Accessibility: ensure the Select2 "rendered" element has an accessible name for axe/screen readers.
+// axe flags e.g. `#select2-<id>-container` when it has role="textbox" but no aria-label/labelledby.
+window.applySelect2AccessibleName = (function () {
+	const OPTION_SELECTOR = '.select2-results__option'
+		+ ':not(.select2-results__option--disabled)'
+		+ ':not(:contains("Searching"))';
+
+	function getLiveRegion() {
+		let $region = $('#a11y-select2-live-region');
+		if (!$region.length) {
+			$region = $('<div>', {
+				id:              'a11y-select2-live-region',
+				role:            'status',
+				'aria-live':     'polite',
+				'aria-atomic':   'true',
+				'aria-relevant': 'additions text'
+			}).css({
+				position: 'absolute',
+				left:     '-9999px',
+				width:    '1px',
+				height:   '1px',
+				overflow: 'hidden'
+			}).appendTo('body');
+		}
+		return $region;
+	}
+
+	function announceToLiveRegion(text) {
+		if (!text) return;
+		const $region = getLiveRegion();
+		$region.text('');
+		setTimeout(function () { $region.text(text); }, 50);
+	}
+
+	return function applySelect2AccessibleName(selectEl) {
+		try {
+			const el = (selectEl && selectEl.jquery) ? selectEl.get(0) : selectEl;
+			if (!el || !el.id) return;
+
+			const $rendered = $(`#select2-${el.id}-container`);
+			if ($rendered.length === 0) return;
+
+			const $combobox = $rendered.closest('[role="combobox"]');
+			const listboxId = 'select2-' + el.id + '-results';
+			const placeholderLabel = el.getAttribute('data-placeholder') || el.getAttribute('placeholder');
+
+			// Accessible name
+			const ariaLabel      = el.getAttribute('aria-label');
+			const ariaLabelledBy = el.getAttribute('aria-labelledby');
+			let questionLabel    = '';
+
+			if (ariaLabel) {
+				$rendered.attr('aria-label', ariaLabel);
+				$rendered.removeAttr('aria-labelledby');
+				$combobox.attr('aria-label', ariaLabel);
+				questionLabel = ariaLabel;
+			} else if (ariaLabelledBy) {
+				$rendered.attr('aria-labelledby', ariaLabelledBy);
+				$rendered.removeAttr('aria-label');
+				const labelledById = ariaLabelledBy.split(' ').find(Boolean);
+				questionLabel = labelledById ? $('#' + labelledById).text().trim() : '';
+			} else {
+				const labelEl   = $(`label[for="${el.id}"]`);
+				const labelText = labelEl.length ? labelEl.text().trim() : '';
+				if (labelText) {
+					$rendered.attr('aria-label', labelText);
+					$combobox.attr('aria-label', labelText);
+					questionLabel = labelText;
+				}
+			}
+
+			if (!questionLabel) {
+				questionLabel = placeholderLabel;
+			}
+
+			// Highlight announcer
+			function announceHighlighted(isInitial) {
+				const $listbox = $('#' + listboxId);
+
+				let $highlighted = $listbox.find(OPTION_SELECTOR + '.select2-results__option--highlighted');
+				if (!$highlighted.length) {
+					$highlighted = $listbox.find(OPTION_SELECTOR).first();
+				}
+				if (!$highlighted.length) return;
+
+				if (!$highlighted.attr('id')) {
+					$highlighted.attr('id',
+						listboxId + '-result-' +
+						($highlighted.attr('data-select2-id') || Date.now())
+					);
+				}
+
+				const highlightedId   = $highlighted.attr('id');
+				const highlightedText = $highlighted.text().trim();
+
+				const $searchInput = $('[aria-controls="' + listboxId + '"]').filter('input');
+				if ($searchInput.length) {
+					$searchInput
+						.attr('role', 'combobox')
+						.attr('aria-activedescendant', highlightedId);
+					if (!$searchInput.attr('aria-label') || !$searchInput.attr('aria-label').trim()) {
+						$searchInput.attr('aria-label', questionLabel);
+					}
+					if ((!$searchInput.attr('placeholder') || !$searchInput.attr('placeholder').trim()) && placeholderLabel) {
+						$searchInput.attr('placeholder', placeholderLabel);
+					}
+				}
+				$combobox.attr('aria-activedescendant', highlightedId);
+
+				if (isInitial) {
+					const total = $listbox.find(OPTION_SELECTOR).length;
+					announceToLiveRegion(highlightedText + ', ' + total + ' options available');
+				} else {
+					announceToLiveRegion(highlightedText);
+				}
+			}
+
+			// Events
+			$(el)
+				.off('select2:focus.a11y select2:open.a11y select2:close.a11y')
+				.on('select2:focus.a11y', function () {
+					if (questionLabel) {
+						announceToLiveRegion('Please select an option for ' + questionLabel);
+					}
+				})
+				.on('select2:open.a11y', function () {
+					$combobox
+						.attr('aria-controls', listboxId)
+						.attr('aria-owns', listboxId);
+
+					$(document)
+						.off('focusin.a11y-' + el.id)
+						.on('focusin.a11y-' + el.id, function (e) {
+							const $target = $(e.target);
+							if (!$target.is('input') || $target.attr('aria-controls') !== listboxId) return;
+							$(document).off('focusin.a11y-' + el.id);
+
+							let attempts      = 0;
+							const maxAttempts = 20;
+							const poll        = setInterval(function () {
+								attempts++;
+								const $opts = $('#' + listboxId).find(OPTION_SELECTOR);
+								if ($opts.length || attempts >= maxAttempts) {
+									clearInterval(poll);
+									if ($opts.length) announceHighlighted(true);
+								}
+							}, 100);
+						});
+
+					$(document)
+						.off('keydown.a11y-' + el.id)
+						.on('keydown.a11y-' + el.id, function (e) {
+							if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+							setTimeout(function () { announceHighlighted(false); }, 50);
+						});
+				})
+				.on('select2:close.a11y', function () {
+					$(document)
+						.off('keydown.a11y-' + el.id)
+						.off('focusin.a11y-' + el.id);
+
+					$('#' + listboxId).find('[data-select2-id]').removeAttr('id');
+
+					$('[aria-controls="' + listboxId + '"]').filter('input')
+						.attr('role', 'searchbox')
+						.removeAttr('aria-activedescendant');
+
+					$combobox
+						.removeAttr('aria-owns')
+						.removeAttr('aria-controls')
+						.removeAttr('aria-activedescendant');
+				});
+
+		} catch (e) {
+			console.error('window.applySelect2AccessibleName error', e);
+		}
+	};
+
+}());
+
+// React helper: initialize Select2 for selects inside a container rendered/updated by React
+// (especially when using `dangerouslySetInnerHTML`).
+window.reactInitSelect2 = function (containerEl) {
+	try {
+		if (!containerEl) return;
+
+		const $container = (containerEl && containerEl.jquery) ? containerEl : $(containerEl);
+		if (!$container || $container.length === 0) return;
+
+		// Normalize Select2 inside this container (if any)
+		if (typeof window.setupSelects === 'function') {
+			const $selects = $container
+				.find('select.auto-select2, select.select2')
+				.filter(function () { return !$(this).data('select2'); });
+
+			if ($selects.length > 0) {
+				window.setupSelects($selects);
+			}
+		}
+	} catch (e) {
+		console.error('window.reactInitSelect2 error', e);
+	}
+};
+
+// Backwards-compatible aliases (deprecated)
+window.runPostRenderLoaders = window.reactInitSelect2;
+window.setupSelectsInContainer = window.reactInitSelect2;
+
+window.setupMultiSelects = function (selector, selectableHeader, selectionHeader, options) {
+	if (!selector) selector = '.auto-multi-select';
+	if (!selectableHeader) selectableHeader = 'Available';
+	if (!selectionHeader) selectionHeader = 'Selected';
+	if (options) {
+		$(selector).first().children().remove()
+	}
+
+	$(selector).multiSelect({
+		selectableHeader: "<h4>" + selectableHeader + "</h4>",
+		selectionHeader: "<h4>" + selectionHeader + "</h4>"
+	});
+
+	if(options) {
+		$(selector).multiSelect('addOption', options)
+		var selectedOptions = options.map(function (opt){
+			return opt.selected === true ? opt.value + "" : null
+		}).filter(function (opt){
+			return opt;
+		});
+		$(selector).multiSelect('select', selectedOptions)
+	}
+}
+
+window.setupSelects = function (selector, width, options) {
+	//console.warn("window.setupSelects!");
+	if (!selector) selector = '.auto-select2';
+	if (!width) width = '100%';
+	if (!options) options = {};
+
+	var defaultOptions = { width: width }
+	Object.assign(options, defaultOptions);
+
+	const $elements = $(selector).select2(options);
+
+	try {
+		$elements.each(function () {
+			window.bindSelect2LabelClick(this);
+			// Generally helpful across the app; critical for axe on some Select2 configurations.
+			window.applySelect2AccessibleName(this);
+		});
+	} catch (e) {
+		console.error('window.setupSelects: error applying Select2 helpers', e);
+	}
+
+	return $elements;
+};
+
+window.setupAjaxSelects = function (selector, options) {
+	if (!options) options = {};
+
+	// Remember to include options
+	return window.setupSelects(selector, options['width'], {
+		placeholder: "Please Select",
+		allowClear: options['allowClear'],
+		templateSelection: options['templateSelection'],
+		dropdownParent: options['dropdownParent'],
+		ajax: {
+			minimumInputLength: 2,
+			url: options['url'],
+			dataType: "json",
+			delay: options['delay'] || 250,
+			processResults: options['processResults'] || function (data) {
+				var res = data.map(function (val) {
+					return { id: val.id, text: (val.text || val.name), service_type: val.class }
+				});
+				return { results: res };
+			},
+		}
+	});
+};
+
+// Renders a language option with an optional alternative name hint e.g. "Spanish (Espanol)"
+function _languageTemplateResult(item) {
+	if (!item.id) return item.text;
+	if (item.matched_alt) {
+		return $('<span>').append(
+			document.createTextNode(item.text),
+			$('<small>').addClass('language-alt-hint ms-1 text-capitalize').text('(' + item.matched_alt + ')')
+		);
+	}
+	return item.text;
+}
+
+// Shared base Select2 options for both AJAX and static language selects
+function _languageSelectBaseOptions(options) {
+	return {
+		placeholder: options.placeholder || 'Please Select',
+		allowClear: options.allowClear,
+		dropdownParent: options.dropdownParent,
+		templateResult: _languageTemplateResult
+	};
+}
+
+/*
+ * Sets up an AJAX language select with two optgroups: "LANGUAGES" (name matches) and
+ * "ALSO KNOWN AS" (alternative name matches). Passes grouped=true to the server endpoint.
+ * options: { url, allowClear, dropdownParent, ... }
+ */
+window.setupAjaxLanguageSelect = function(selector, options) {
+	options = options || {};
+	var baseUrl = options.url || Routes.languages_path();
+	// When valueField is 'name', the submitted <option> value is the language name instead of its id.
+	// Used by search filters whose backend matches on the language name (e.g. Chewy call search),
+	// so they keep working without any datatable/index changes. Defaults to 'id'.
+	var valueField = options.valueField === 'name' ? 'name' : 'id';
+	var flatResult = function(val) {
+		var text = val.text || val.name;
+		return { id: (valueField === 'name' ? text : val.id), text: text };
+	};
+
+	if (!window.GLOBO_LANGUAGE_SEARCH_IMPROVEMENTS) {
+		return window.setupAjaxSelects(selector, {
+			width: options.width || '100%',
+			placeholder: options.placeholder,
+			allowClear: options.allowClear,
+			url: baseUrl,
+			processResults: function(data) {
+				return { results: (data || []).map(flatResult) };
+			}
+		});
+	}
+
+	var separator = baseUrl.indexOf('?') !== -1 ? '&' : '?';
+	var url = baseUrl + separator + 'grouped=true';
+
+	var selectOptions = _languageSelectBaseOptions(options);
+	// minimumInputLength is a top-level Select2 option (nesting it under `ajax` leaves it unset).
+	// Keep it 0 so opening the control runs an empty-term query: the languages endpoint returns
+	// the full list by main name (index.json.jbuilder `else` branch) instead of a "type 2 or more
+	// characters" hint, then grouped name/alt search kicks in as the user types.
+	selectOptions.minimumInputLength = 0;
+	selectOptions.ajax = {
+		url: url,
+		dataType: 'json',
+		delay: options.delay || 250,
+		data: function(params) { return { term: params.term }; },
+		processResults: function(data) {
+			if (data && data.results) {
+				if (valueField === 'name') {
+					// Remap grouped children so the option value (id) is the language name.
+					return { results: data.results.map(function(group) {
+						if (group.children) {
+							return { text: group.text, children: group.children.map(function(c) {
+								return { id: c.text, text: c.text, matched_alt: c.matched_alt };
+							}) };
+						}
+						return { id: group.text, text: group.text, matched_alt: group.matched_alt };
+					}) };
+				}
+				return data;
+			}
+			return { results: (data || []).map(flatResult) };
+		}
+	};
+
+	return window.setupSelects(selector, options.width, selectOptions);
+};
+
+/*
+ * DataTables feature plugin: renders the grouped language Select2 (LANGUAGES + ALSO
+ * KNOWN AS) as a first-class table control via the "Q" dom letter, instead of removing
+ * the native filter after init. Picking a language runs the table's global search for
+ * that name; clearing it resets the search. Configured per table through the
+ * `languageSearch` init option (see window.setupDataTableLanguageSearch).
+ */
+if ($.fn.dataTable && $.fn.dataTable.ext && !$.fn.dataTable.ext.feature.languageSearchRegistered) {
+	$.fn.dataTable.ext.feature.languageSearchRegistered = true;
+	$.fn.dataTable.ext.feature.push({
+		cFeature: 'Q',
+		sFeature: 'LanguageSearch',
+		fnInit: function(settings) {
+			var api = new $.fn.dataTable.Api(settings);
+			var opts = (settings.oInit && settings.oInit.languageSearch) || {};
+			var labelText = opts.label || 'Search:';
+			var selectId = (settings.sTableId || 'dt') + '-language-search';
+
+			var $wrapper = $('<div class="dataTables_filter dt-language-search"></div>');
+			// suppresses that native focus steal and keeps the caret in the search box.
+			var $label = $('<label></label>').attr('for', selectId).text(labelText + ' ');
+			var $select = $('<select></select>')
+				.attr('id', selectId)
+				.attr('aria-label', labelText.replace(/:\s*$/, ''))
+				.appendTo($label);
+			$wrapper.append($label);
+
+			// Select2 needs the node in the DOM, so defer wiring until init completes.
+			api.one('init', function() {
+				window.setupAjaxLanguageSelect('#' + selectId, {
+					url: Routes.languages_path(),
+					allowClear: true,
+					placeholder: opts.placeholder || ' ',
+					width: opts.width || '260px'
+				});
+
+				// Tag the generated Select2 container so a fixed width can be enforced via CSS
+				// (the inline width Select2 sets otherwise grows/shrinks with the selected text).
+				$select.next('.select2-container').addClass('language-table-search-container');
+
+				$select.on('select2:select', function(e) {
+					api.search(e.params.data.text).draw();
+				}).on('select2:clear', function() {
+					api.search('').draw();
+				});
+			});
+
+			return $wrapper[0];
+		}
+	});
+}
+
+/*
+ * Initializes a single table as a DataTable with the grouped language search control.
+ * Driven by markup — the table carries the config and the marker attribute:
+ *   <table id="..." class="auto-data-table" data-language-search data-language-search-placeholder="...">
+ * Called from _setup_tables.js.erb only when the feature flag is on; those tables are
+ * excluded from the plain auto-data-table init so they are not double-initialized.
+ */
+window.setupDataTableLanguageSearch = function(tableEl) {
+	var $table = $(tableEl);
+	if (!$table.length || $.fn.DataTable.isDataTable($table)) return;
+
+	// Reuse DataTables' default layout, swapping the native filter ("f") for the grouped
+	// language search feature ("Q", registered above) so the toolbar matches other tables.
+	var dom = ($.fn.dataTable.defaults.dom || 'lfrtip').replace('f', 'Q');
+
+	var options = {
+		serverSide: false,
+		searching: true,
+		dom: dom,
+		languageSearch: {
+			label: $table.data('language-search-label') || 'Search:',
+			placeholder: $table.data('language-search-placeholder') || 'Search language',
+			width: $table.data('language-search-width') || '260px'
+		}
+	};
+
+	// Honor a declarative initial sort order (e.g. data-dt-order='[[1, "asc"]]') when present.
+	var order = $table.data('dt-order');
+	if (order) options.order = order;
+
+	window.setupDataTable($table, options);
+};
+
+// Initializes every [data-language-search] table on the page.
+window.setupDataTableLanguageSearches = function() {
+	$('[data-language-search]').each(function() {
+		window.setupDataTableLanguageSearch(this);
+	});
+};
+
+/*
+ * Sets up a static language select with grouped search using local data.
+ * Initial open: flat list of all language names.
+ * While typing: grouped results — "LANGUAGES" (name matches) + "ALSO KNOWN AS" (alt name matches).
+ * languages: array of { id, name, alternative_names }
+ * options: { width, selectedId, selectedIds, placeholder, allowClear, dropdownParent }
+ */
+window.setupLanguageSelectWithGroups = function(selector, languages, options) {
+	options = options || {};
+	if (!window.GLOBO_LANGUAGE_SEARCH_IMPROVEMENTS) {
+		return window.setupSelects(selector, options.width || '100%', { placeholder: options.placeholder, allowClear: options.allowClear });
+	}
+	languages = languages || [];
+
+	var $select = $(selector);
+	$select.empty().append('<option></option>');
+
+	// Pre-populate selected option(s) so Select2 displays them
+	var selectedIds = options.selectedIds || (options.selectedId ? [options.selectedId] : []);
+	selectedIds.forEach(function(selId) {
+		var lang = languages.filter(function(l) { return String(l.id) === String(selId); })[0];
+		if (lang) $select.append($('<option>').val(lang.id).text(lang.name).prop('selected', true));
+	});
+
+	var selectOptions = _languageSelectBaseOptions(options);
+	selectOptions.ajax = {
+		delay: 0,
+		transport: function(params, success) {
+			var term = (params.data && params.data.term) ? params.data.term.trim() : '';
+			if (!term) {
+				success({ results: languages.map(function(l) { return { id: l.id, text: l.name }; }) });
+				return;
+			}
+			var termLower = term.toLowerCase();
+			var nameMatches = [];
+			var nameMatchIds = {};
+			var altMatches = [];
+			languages.forEach(function(l) {
+				var nameMatch = l.name.toLowerCase().indexOf(termLower) !== -1;
+				if (nameMatch) {
+					nameMatches.push({ id: l.id, text: l.name });
+					nameMatchIds[l.id] = true;
+				}
+				// Misspellings: search-only, merge silently into name matches (no hint shown)
+				var misspellings = Array.isArray(l.misspellings) ? l.misspellings : [];
+				if (!nameMatchIds[l.id]) {
+					misspellings.forEach(function(mis) {
+						if (mis.toLowerCase().indexOf(termLower) !== -1) {
+							nameMatches.push({ id: l.id, text: l.name });
+							nameMatchIds[l.id] = true;
+						}
+					});
+				}
+				// Alternative names: search + show hint
+				var altNames = Array.isArray(l.alternative_names) ? l.alternative_names : [];
+				altNames.forEach(function(alt) {
+					if (alt.toLowerCase().indexOf(termLower) !== -1) {
+						altMatches.push({ id: l.id, text: l.name, matched_alt: alt });
+					}
+				});
+			});
+			var groups = [];
+			if (nameMatches.length) groups.push({ text: 'LANGUAGES', children: nameMatches });
+			if (altMatches.length) groups.push({ text: 'ALSO KNOWN AS', children: altMatches });
+			success({ results: groups });
+		}
+	};
+
+	return window.setupSelects(selector, options.width || null, selectOptions);
+};
+
+// Stole from: https://thelazylog.com/custom-dialog-for-data-confirm-in-rails/
+window.setupConfirmLinks = function (selector, message, url) {
+	// Install SweetAlert confirm for @rails/ujs (modern Rails UJS).
+	// @rails/ujs calls `Rails.confirm(message, element)` synchronously. We can't block for a Promise,
+	// so we return `false` to halt the action, then re-trigger the click/submit after the user confirms.
+	if (!window.__globoSweetAlertRailsConfirmInstalled && window.Rails && typeof window.Rails.confirm === 'function') {
+		window.__globoSweetAlertRailsConfirmInstalled = true;
+
+		var originalRailsConfirm = window.Rails.confirm;
+
+		window.Rails.confirm = function (message, element) {
+			// If there's no element to re-trigger, fall back to original confirm behavior.
+			if (!element) {
+				return originalRailsConfirm(message, element);
+			}
+
+			// Avoid infinite loops: once confirmed, allow UJS to proceed.
+			if (element.dataset && element.dataset.confirmed === 'true') {
+				delete element.dataset.confirmed;
+				return true;
+			}
+
+			// If SweetAlert isn't available yet, fall back.
+			if (typeof window.sconfirm !== 'function') {
+				return originalRailsConfirm(message, element);
+			}
+
+			window.sconfirm('Warning', message, { cancel: true, confirm: "Yes, Confirm" }).then(function (value) {
+				if (value === true) {
+					try {
+						if (element.dataset) {
+							element.dataset.confirmed = 'true';
+						}
+
+						// Re-trigger the original action with confirm temporarily bypassed.
+						if (element.tagName === 'FORM') {
+							// requestSubmit is preferred; submit bypasses submit handlers.
+							if (typeof element.requestSubmit === 'function') {
+								element.requestSubmit();
+							} else {
+								element.submit();
+							}
+						} else {
+							element.click();
+						}
+					} finally {
+						// If navigation happens, this won't matter; otherwise cleanup quickly.
+						window.setTimeout(function () {
+							if (element && element.dataset) {
+								delete element.dataset.confirmed;
+							}
+						}, 0);
+					}
+				}
+			});
+
+			// Halt current UJS action; we'll retry after confirmation.
+			return false;
+		};
+	}
+
+	//Override the default confirm dialog by rails
+	$.rails.allowAction = function (link) {
+		if (link.data("confirm") == undefined) {
+			return true;
+		}
+		$.rails.showConfirmationDialog(link);
+		return false;
+	}
+
+	//User click confirm button
+	$.rails.confirmed = function (link) {
+		link.data("confirm", null);
+		link.trigger("click.rails");
+	}
+
+	//Display the confirmation dialog
+	$.rails.showConfirmationDialog = function (link) {
+		var message = link.data("confirm");
+		window.sconfirm('Warning', message, {
+			cancel: true,
+			confirm: "Yes, Confirm"
+		}).then(function (value) {
+			if (value === true) {
+				$.rails.confirmed(link);
+			}
+		});
+	};
+};
+
+window.preSelect = function (selector, id, text) {
+
+	var sel = $(selector);
+	var option = new Option(text, id, true, true);
+	sel.append(option).trigger('change');
+
+	sel.trigger({
+		type: 'select2:select',
+		params: {
+			data: {id: id, text: text}
+		}
+	});
+
+};
+
+window.setupAutoEditableSelects = function (selector) {
+	if (!selector) selector = '.auto-editable';
+	return setupEditableSelects(selector, null, true);
+}
+
+window.setupEditableSelects = function (selector, width, setEditable, onShown) {
+	if (!selector) selector = '.auto-editable';
+
+	width = width || '150px';
+
+	$(selector).on('shown', function (e, b) {
+		if(onShown) onShown(this, e, b)
+		window.setupSelects(b.input.$input, width, {
+			placeholder: {
+				id: '-1',
+				text: 'Please Select'
+			}
+		});
+
+	}).on('hidden', function(event, reason) {
+//		console.warn('hidden', event);
+//		$(event.target).find('.editable-input select').select2('destroy')
+  });
+
+	if (setEditable) {
+		$(selector).editable(); // TODO: test
+	}
+
+};
+
+/*
+ * Same as setupEditableSelects but uses setupAjaxLanguageSelect (grouped AJAX search)
+ * instead of a flat static Select2. Use for x-editable language fields.
+ * When GLOBO_LANGUAGE_SEARCH_IMPROVEMENTS is off, falls back to plain setupEditableSelects.
+ */
+window.setupEditableLanguageSelects = function (selector, width) {
+	if (!selector) selector = '.auto-editable';
+
+	width = width || '150px';
+
+	$(selector).on('shown', function (e, b) {
+		var $s2 = window.GLOBO_LANGUAGE_SEARCH_IMPROVEMENTS
+			? window.setupAjaxLanguageSelect(b.input.$input, { width: width })
+			: window.setupSelects(b.input.$input, width, { placeholder: { id: '-1', text: 'Please Select' } });
+
+		// x-editable's activate() calls $select.focus() after shown fires — intercept it to open
+		// Select2 instead of letting native focus trigger jump-to-letter selection on the hidden <select>.
+		b.input.$input.one('focus.s2open', function() {
+			$s2.select2('open');
+		});
+	}).on('hidden', function(event, reason) {
+		// intentionally empty — mirrors setupEditableSelects
+	});
+};
+
+window.setupEditableDates = function (selector) {
+	if (!selector) selector = '.auto-editable-date';
+	$(selector).on('shown', function (e, b) {
+		b.input.$input.parent().find('.add-on').find('i').addClass('fa fa-calendar').addClass('d-inline-block')
+				.css('margin-left', '-22px')
+				.css('width', '25px');
+		b.input.$input.addClass('form-control');
+	});
+};
+
+window.clearSelect = function (selector) {
+	if (!selector) return;
+	try {
+		$(selector).val(null).trigger('change');
+	} catch (e) {
+		console.error(e);
+	}
+};
+
+window.setupModals = function (selector) {
+	selector = selector || '.modal';
+	$(selector).appendTo('#modals-placeholder')
+};
+
+window.setupCkEditor = function (selector) {
+	ClassicEditor.create(selector)
+			.then(editor => {
+				// Retain the instance so setupWafSafeEncoding can read live data (getData()) at submit time instead of relying on source-element sync.
+				if (selector) selector.ckeditorInstance = editor;
+			})
+			.catch(error => {
+				console.error(error);
+			});
+};
+
+// WAF-safe rich-text submission
+// -----------------------------------------------------------------------------
+// AWS WAF managed rules (RFI/XSS body inspection) at the edge reject POST bodies that contain inline anchor HTML or links such as ".../j.php?MTID=...".
+// Those legitimately appear in our rich-text fields, producing a 403 *before* the request reaches Rails.
+// To avoid it, we base64-encode flagged field values (prefixed with WAF_SAFE_PREFIX) just before submit; the server decodes them via the WafSafeParams concern.
+// Tag a field with class "js-waf-safe-encode".
+window.WAF_SAFE_PREFIX = '__WAFB64__';
+
+window.wafSafeEncodeValue = function (str) {
+	var bytes = new TextEncoder().encode(str == null ? '' : String(str));
+	var binary = '';
+	for (var i = 0; i < bytes.length; i++) {
+		binary += String.fromCharCode(bytes[i]);
+	}
+	return window.WAF_SAFE_PREFIX + btoa(binary);
+};
+
+window.setupWafSafeEncoding = function (selector) {
+	if (!selector) selector = '.js-waf-safe-encode';
+
+	$(selector).each(function () {
+		var el = this;
+
+		// rich_text_area puts the class on <trix-editor>, but the submitted value lives in its backing hidden input (referenced by the "input" attribute).
+		var field = el;
+		if (el.tagName === 'TRIX-EDITOR') {
+			var inputId = el.getAttribute('input');
+			if (inputId && document.getElementById(inputId)) field = document.getElementById(inputId);
+		}
+
+		var form = field.form || $(field).closest('form')[0];
+		if (!form || field.dataset.wafSafeBound === 'true') return;
+		field.dataset.wafSafeBound = 'true';
+
+		form.addEventListener('submit', function () {
+			try {
+				// Prefer CKEditor's live data; otherwise read the element value (Trix keeps its hidden input synced; plain textareas read directly).
+				var raw = field.ckeditorInstance ? field.ckeditorInstance.getData() : field.value;
+
+				// Submit the encoded value under the field's real name via a hidden input, and drop the name from the original element so the raw,
+				// WAF-triggering HTML is never sent — even if another submit handler (e.g. CKEditor's source sync) writes back into it afterwards.
+				if (!field._wafHidden) {
+					field._wafHidden = document.createElement('input');
+					field._wafHidden.type = 'hidden';
+					field.parentNode.insertBefore(field._wafHidden, field);
+				}
+				var name = field.getAttribute('name');
+				if (name) field._wafHidden.name = name;
+				field._wafHidden.value = window.wafSafeEncodeValue(raw);
+				field.removeAttribute('name');
+			} catch (e) {
+				console.error('window.setupWafSafeEncoding: failed to encode field', e);
+			}
+		});
+	});
+};
+
+window.setupPaginationStyles = function () {
+	$('.pagination ul').addClass('pagination');
+	$('.pagination ul li').addClass('paginate_button page-item');
+	$('.pagination a').attr('data-remote', 'true').addClass('page-link');
+};
+
+/**
+ * This sets up autocomplete tags for acts_on_taggable
+ * Usage: window.setupTags('#resource_pool_tag_list')
+ *  <div class="old-form-group row">
+ *    <#= form.label 'Tags', class: 'col-form-label col-sm-2' %>
+ *    <div class="col-sm-10">
+ *      <div class="tag_container">
+ *        <div id="resource_pool_tag_list" data-tags="tag1,tag2,tag2" data-attribute-name="resource_pool[resource_pool_tag_list][]" class="auto-tags input textarea clearfix custom stackoverflow"></div>
+ *      </div>
+ *    </div>
+ *  </div>
+ * @param selector
+ */
+window.setupTags = function (selector) {
+	if (!selector) selector = '.auto-tags';
+	$(selector).each(function (index, el) {
+		el = $(el);
+		var attribute = el.data('attribute-name');
+		var tags = el.data('tags').split(',').filter(function (a) {
+			return a;
+		});
+		var tag = new Taggle(el.attr('id'), {
+			tags: tags,
+			hiddenInputName: attribute,
+			duplicateTagClass: 'bounce'
+		});
+		var container = tag.getContainer();
+		var input = tag.getInput();
+
+		$(input).autocomplete({
+			source: "https://globohq.com/admin/tags/autocomplete_tag_name",
+			appendTo: container,
+			position: {at: "left bottom", of: container},
+			select: function (event, data) {
+				event.preventDefault();
+				//Add the tag if user clicks
+				if (event.which === 1) {
+					tag.add(data.item.value);
+				}
+			}
+		})
+	});
+};
+
+/*
+  options = {
+		initialTags: [],
+		autocompleteUrl: '',
+		placeholder: '',
+		hiddenInputName: ''
+	}
+ */
+window.setupCustomTags = function (selector, options) {
+	options = options || {};
+	$(selector).each(function(index, el) {
+		var element = new Taggle(el.id, {
+			tags: options.initialTags || [],
+			placeholder: options.placeholder,
+			hiddenInputName: options.hiddenInputName,
+			duplicateTagClass: 'bounce',
+			additionalTagClasses: options.tagClass || ''
+		});
+		var container = element.getContainer();
+		var input = element.getInput();
+
+		if (!!options.autocompleteUrl) {
+			$(input).autocomplete({
+				source: options.autocompleteUrl,
+				appendTo: container,
+				position: { at: "left bottom", of: container },
+				select: function (event, data) {
+					event.preventDefault();
+					//Add the tag if user clicks
+					if (event.which === 1) {
+						element.add(data.item.value);
+					}
+				}
+			});
+		};
+	});
+};
+
+if (window.onLoaded) {
+	window.onLoaded(function () {
+		window.setupDatePickers('.date-picker');
+		window.setupDatetimePickers('.datetime-picker');
+		window.setupTimePickers('.time-picker');
+		window.setupCheckboxes();
+		window.setupToggleSwitches('.auto-toggle-switch');
+		window.setupRequestButtons();
+		window.setupSelects();
+		window.setupAutoEditableSelects();
+		window.setupEditableDates();
+		window.setupMultiSelects();
+		window.setupTags();
+		window.setupConfirmLinks();
+		window.setupWafSafeEncoding();
+	}, true);
+}
+
+		
+// Helper function to handle server-side export with all data
+function handleServerSideExport(dt, button, config, buttonContext, exportType) {
+	// Show processing indicator
+	dt.processing(true);
+
+	// For server-side: fetch all data via AJAX
+	const ajaxSettings = dt.ajax.params();
+
+	// Request all records
+	ajaxSettings.length = 10000;
+	ajaxSettings.start = 0;
+	delete ajaxSettings.draw;
+
+	$.ajax({
+		url: dt.ajax.url(),
+		data: ajaxSettings,
+		success: function(json) {
+			// Store original settings
+			const originalServerSide = dt.settings()[0].oFeatures.bServerSide;
+			const originalData = dt.data().toArray();
+
+			// Temporarily disable server-side
+			dt.settings()[0].oFeatures.bServerSide = false;
+
+			// Clear and add data WITHOUT drawing (preserves server order)
+			dt.clear();
+			dt.rows.add(json.data);
+
+			// Trigger the appropriate export action
+			const exportActions = {
+				excel: $.fn.dataTable.ext.buttons.excelHtml5.action,
+				csv: $.fn.dataTable.ext.buttons.csvHtml5.action
+			};
+
+			exportActions[exportType].call(buttonContext, null, dt, button, config);
+
+			// Restore original state
+			dt.clear();
+			dt.rows.add(originalData);
+			dt.settings()[0].oFeatures.bServerSide = originalServerSide;
+			dt.draw(false);
+			dt.processing(false);
+		},
+		error: function(xhr, status, error) {
+			console.error('Export failed:', error);
+			alert('Failed to export data. Please try again.');
+			dt.processing(false);
+		}
+	});
+}
+
+//window.DataTablesExportButtons = function (formats = ['excel', 'csv', 'pdf', 'copy', 'json'], options = {}) {
+window.DataTablesExportButtons = function (formats = ['excel', 'csv'], options = {}) {
+	const exportDefaults = {
+//		columns: ':visible',
+		modifier: {
+			search: 'applied',
+			page: options.exportAll === true ? 'all' : 'current',
+		},
+		rows: { order: 'current', search: 'none' }, // export all rows
+	}
+	const defaultStyles = {
+		excel: 'btn-secondary',
+		csv: 'btn-secondary',
+		pdf: 'btn-secondary',
+		copy: 'btn-secondary',
+		json: 'btn-secondary',
+	};
+	const styles = { ...defaultStyles, ...(options.style || {}) };
+
+	const buttonConfigs = {
+		excel: {
+			extend: 'excelHtml5', text: '<i class="fa fa-file-excel"></i> Excel', className: `btn-sm btn-outline ${styles.excel}`,
+			title: (options.title && options.title.excel) || 'Export XLS',
+			sheetName: options.sheetName || 'Exported data', autoFilter: true,
+			action: function (e, dt, button, config) {
+				if (options.exportAll && dt.page.info().serverSide) {
+					handleServerSideExport(dt, button, config, this, 'excel');
+				} else {
+					$.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+				}
+			},
+      exportOptions: exportDefaults,
+		},
+		csv: {
+			extend: 'csvHtml5', text: '<i class="fa fa-file-csv"></i> CSV', className: `btn-sm btn-outline ${styles.csv}`,
+			title: (options.title && options.title.csv) || 'Export CSV',
+			action: function (e, dt, button, config) {
+				if (options.exportAll && dt.page.info().serverSide) {
+					handleServerSideExport(dt, button, config, this, 'csv');
+				} else {
+					$.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
+				}
+			},
+      exportOptions: exportDefaults
+		},
+		pdf: {
+			extend: 'pdfHtml5', text: '<i class="fa fa-file-pdf"></i> PDF', className: `btn-sm btn-outline ${styles.pdf}`,
+			title: (options.title && options.title.pdf) || 'Export PDF',
+			action: function (e, dt, button, config) {
+				const exportData = dt.buttons.exportData();
+				const docDefinition = {
+					content: [
+						{ text: (options.title && options.title.pdf) || 'Export PDF', style: 'header' },
+						{ table: { headerRows: 1, body: [ exportData.header, ...exportData.body ] } },
+					],
+					styles: { header: { fontSize: 18, bold: true, margin: [0, 0, 0, 10] } }
+				};
+				pdfMake.createPdf(docDefinition).download( (options.title && options.title.pdf) || 'Export.pdf' );
+			},
+			exportOptions: exportDefaults,
+		},
+		copy: {
+			extend: 'copyHtml5', text: '<i class="fa fa-copy"></i> Copy', className: `btn-sm btn-outline ${styles.copy}`,
+			key: { key: 'c', altKey: true },
+			exportOptions: { columns: ':visible' }
+		},
+		json: { // Does not support image icons at the moment
+			text: 'JSON', className: `btn-sm btn-outline ${styles.json}`,
+			action: function (e, dt, button, config) {
+				const exportData = dt.buttons.exportData();
+				const cleanData = { header: exportData.header, body: exportData.body, footer: exportData.footer };
+				const blob = new Blob([JSON.stringify(cleanData, null, 2)], { type: 'application/json;charset=utf-8' });
+				saveAs(blob, (options.title && options.title.json) || 'Export.json');
+			},
+		}
+	};
+
+	return formats.filter(format => buttonConfigs[format]).map(format => buttonConfigs[format]);
+};
+
+
+// Get the default config from the class
+const defaultDatatableConfig = new DataTablesBootstrap5().defaultConfig;
+const customOptions = {
+	// IF NO CUSTOM OPTIONS, defaultBootstrapConfig will be used
+	// Custom options can be added here if needed
+
+//  pageLength: 25, // Override the default page length to 25
+//	top: ['pageLength', 'search'],
+//	bottom: ['info', 'paging'],
+
+//	serverParams: function (data) {
+//		function addSortColumnAsParams(datatable) {
+//			// DataTables 2.0 uses 'order' array with column index and direction
+//			if (data.order && data.order.length > 0) {
+//				var sortColumnIndex = data.order[0].column;
+//				var sortDirection = data.order[0].dir;
+
+//				var headerElement = $(datatable).find('th').get(sortColumnIndex);
+//				var sortColumn = $(headerElement).data('sort-column');
+
+//				// If no data-sort-column, try to get from columns data property
+//				if (!sortColumn && data.columns && data.columns[sortColumnIndex]) {
+//					sortColumn = data.columns[sortColumnIndex].data;
+//				}
+
+//				if (sortColumn && sortColumn.length > 0) {
+//					data.sort_column = sortColumn;
+//					data.sort_order = sortDirection;
+//				}
+//			}
+//		}
+
+//		addSortColumnAsParams(this);
+//	},
+};
+window.DTOptions = $.extend(true, {}, defaultDatatableConfig, customOptions); // Merge default config with custom options
+
+
+// Helper method to set client side data table
+window.setupDataTableCS = function (selector) {
+	return window.setupDataTable(selector, { serverSide: false, filter: true, searching: true });
+}
+
+window.setupDataTable = function (selector, options) {
+	//	$.fn.dataTable.ext.errMode = 'throw'; // No longer works on DT 2.0 needs need to attach an error.dt event listener after initializing the DataTable
+	selector = selector || '.data-table';
+
+	if (!options) options = {};
+	// Handle custom ajaxSource option
+	if (options.ajaxSource) {
+		var serverParamsFn = options.serverParams;
+
+		options.ajax = {
+			url: options.ajaxSource,
+			data: function (d) {
+				// TODO: Replace and change in every datatable invocation
+				// DataTables 2.0 uses object format, not array
+				// If serverParams expects array format, convert object to array
+				if (serverParamsFn) {
+					var dataArray = [];
+					for (var key in d) {
+						if (d.hasOwnProperty(key)) {
+							dataArray.push({name: key, value: d[key]});
+						}
+					}
+					serverParamsFn.call(this, dataArray);
+
+					dataArray.forEach(function(item) { // Convert array back to object for DataTables 2.0
+						d[item.name] = item.value;
+					});
+				}
+				return d;
+			}
+		};
+		delete options.ajaxSource;
+		delete options.serverParams;
+	}
+
+	// merge columnDefs so the `no-sort` class handling is not overridden
+	if ( Array.isArray(options.columnDefs) && Array.isArray(window.DTOptions.columnDefs) ) {
+		for (var i = 0; i < window.DTOptions.columnDefs.length; i++) {
+			options.columnDefs.push(window.DTOptions.columnDefs[i]);
+		}
+	}
+
+	options = $.extend({}, window.DTOptions, options);
+	var dt = $( selector ).DataTable( options );
+//	console.debug("window.setupDataTable (options) :: ", options);
+
+	window.setTimeout(function () { $('.dataTables_length select').select2(); }, 500)
+	window.setupRemotePaginate();
+
+	return dt;
+};
+
+window.reloadDataTable = function (selector) {
+	if ($.fn.DataTable.isDataTable(selector)) {
+		$(selector).DataTable().ajax.reload();
+	}
+}
+
+window.setupRemotePaginate = function (selector, klass) {
+	klass = klass || 'remote-paginate'
+	selector = selector || '.' + klass;
+
+	$(selector + ' a').attr('data-remote', 'true');
+	$(selector + ' ul').addClass(klass);
+}
+
+window.setupSortableTable = function (selector, url) {
+	selector = selector || '.table-sortable';
+	$(selector).sortable({
+		handle: '.handle',
+		update: function (event, ui) {
+			var data = $(this).sortable('serialize');
+			url = url || $(this).data('sort-url');
+			$.ajax({
+				data: data,
+				type: 'PUT',
+				url: url
+			});
+		}
+	});
+}
+
+if (window.onLoaded) {
+	window.onLoaded(function () {
+		window.setupSortableTable();
+		var langSearch = window.GLOBO_LANGUAGE_SEARCH_IMPROVEMENTS;
+
+		var plainSelector = '.auto-data-table:not([data-dt-order])';
+		if (langSearch) plainSelector += ':not([data-language-search])';
+		window.setupDataTableCS(plainSelector);
+
+		var orderedSelector = '.auto-data-table[data-dt-order]';
+		if (langSearch) orderedSelector += ':not([data-language-search])';
+		$(orderedSelector).each(function () {
+			window.setupDataTable(this, { serverSide: false, filter: true, searching: true, order: $(this).data('dt-order') });
+		});
+
+		if (langSearch && window.setupDataTableLanguageSearches) window.setupDataTableLanguageSearches();
+	}, true);
+}
+
+		
+window.onLoaded(function () {
+	var notificationChannel = window.client.subscribe('notification-center-100001');
+	notificationChannel.bind('notification', (data) => {
+		window.toastS(data.message, data.title, {
+			onclick: () => { window.open(data.url, '_blank') },
+			icon: data.icon,
+			timeOut: data.dismiss_time,
+			extendedTimeOut: data.dismiss_time
+		});
+	});
+}, true);
+
+
+
+//]]>
+</script>
+
+		<script nonce="QMETG+1AnOqyMfzg/tk21Q==">
+//<![CDATA[
+
+		window.SessionTimeout = {
+			checkTimeUntilTimeout: function() {
+        if(window.SessionTimeout.isActivityInProgress()) {
+					window.SessionTimeout.keepCurrentSessionAlive();
+        } else {
+					$.ajax({
+            url: '/session_timeout/time_until_sign_out.js',
+            type: 'get',
+            dataType: 'script',
+            error: function (xhr, status, text) {
+							if (xhr.status === 401) { window.SessionTimeout.timeoutUser(); }
+						},
+            success: function (timeLeftInSeconds) {
+							let timeoutCheckInSecs = 60;
+							let timeout_warning = 120;
+							if (timeLeftInSeconds <= 0) {
+								window.SessionTimeout.timeoutUser();
+							} else if (timeLeftInSeconds <= timeout_warning && !window.SessionTimeout.sessionNotifyIsShown) {
+								window.SessionTimeout.showSessionTimeoutNotification(timeLeftInSeconds);
+							}
+
+							let remTime = timeLeftInSeconds - (Math.trunc(timeLeftInSeconds / 60) * 60)
+              if (remTime > 0) {
+								timeoutCheckInSecs = remTime;
+							}
+							window.SessionTimeout.scheduleTimeoutCheck(timeoutCheckInSecs * 1000);
+						}
+					});
+        }
+			},
+			scheduleTimeoutCheck: function(inMillis = 0) {
+        if (inMillis === 0) {
+	        inMillis = 60 * 1000
+        }
+        if (window.SessionTimeout.currentTimeout) { clearTimeout(window.SessionTimeout.currentTimeout); }
+        window.SessionTimeout.currentTimeout = setTimeout(window.SessionTimeout.checkTimeUntilTimeout, inMillis);
+			},
+			resetTimeoutTimer: function(hideNotification) {
+				if (hideNotification) { window.SessionTimeout.hideSessionTimeoutNotification(); }
+
+				$.ajax({
+          url: '/session_timeout/reset_timeout_timer.js',
+					type: 'get',
+					dataType: 'script',
+					error: function(xhr, status, text) {
+						if (xhr.status === 401) {
+							window.SessionTimeout.failedTimeout = true;
+							window.SessionTimeout.timeoutUser();
+						}
+					}
+				});
+			},
+			timeoutUser: function() {
+				if (window.SessionTimeout.isActivityInProgress() && !window.SessionTimeout.failedTimeout) {
+          window.SessionTimeout.resetTimeoutTimer(false);
+				}
+				else {
+          let currentUserId = 100001;
+
+          $.ajax({
+            url: '/session_timeout/render_timeout',
+            type: 'get',
+            data: { user_id: currentUserId },
+            error: function(xhr, status, text) { console.warn("SessionTimeout.error", xhr); }
+          });
+				}
+			},
+			showSessionTimeoutNotification: function(remainingSeconds) {
+				let remainingMins = window.SessionTimeout.fmtMSS(remainingSeconds);
+
+        if (!window.SessionTimeout.myToastr) {
+	        window.SessionTimeout.myToastr = toastr['warning'](htmlNoticeWarning(),
+		        'Your session is about to expire',
+		        {
+			        closeButton: false,
+			        progressBar: false,
+			        timeOut: 0,
+			        extendedTimeOut: 0,
+			        tapToDismiss: false
+		        });
+        } else {
+					window.SessionTimeout.myToastr.fadeIn();
+        }
+
+        let countdownDisplay = $('#session-timeout-countdown');
+        countdownDisplay.text(remainingMins);
+        window.SessionTimeout.sessionNotifyIsShown = true;
+				window.SessionTimeout.sessionTimeoutCountdown = setInterval(function () {
+					let remainingMins = window.SessionTimeout.fmtMSS(remainingSeconds);
+          countdownDisplay.text(remainingMins);
+					if (remainingSeconds > 0) {
+						remainingSeconds--;
+					} else {
+						clearInterval(window.SessionTimeout.sessionTimeoutCountdown);
+					}
+				}, 1000);
+			},
+			hideSessionTimeoutNotification: function() {
+        if (window.SessionTimeout.sessionTimeoutCountdown > 0) { clearInterval(window.SessionTimeout.sessionTimeoutCountdown); }
+
+        window.SessionTimeout.myToastr.fadeOut();
+        window.SessionTimeout.sessionNotifyIsShown = false;
+			},
+			isActivityInProgress: function() {
+				var activeAudio = (window.TWL_CALL) || (window.inCallIndicator && window.inCallIndicator.inCall);
+				var activeVideo = (window.twilioRoom) || (window.videoHandler && window.videoHandler.activeRoom) || window.activeSession;
+
+				return activeAudio || activeVideo;
+			},
+      fmtMSS: function(secs) {
+        let timeUnit = "minutes";
+        if (secs < 60) timeUnit = "seconds";
+        return (secs - (secs %= 60)) / 60 + (9 < secs ? ':' : ':0') + secs + " " + timeUnit;
+      },
+      keepCurrentSessionAlive: function() {
+        $.ajax({
+          url: '/session_timeout/keep_current_session_alive.js',
+          type: 'get',
+          error: function(xhr, status, text) {
+            console.warn("SessionTimeout.keepCurrentSessionAlive", xhr)
+          }
+        });
+
+        window.SessionTimeout.scheduleTimeoutCheck();
+      }
+    };
+
+		window.SessionTimeout.scheduleTimeoutCheck();
+    window.SessionTimeout.sessionNotifyIsShown = false;
+    window.SessionTimeout.myToastr = null;
+
+    const htmlNoticeWarning = function () {
+      // CSP-safe: no inline onclick — handler is delegated below
+      let htmlContent = "<div><p>You will be logged out in <span id='session-timeout-countdown'>99:99 minutes</span>.</p></div>";
+      htmlContent += "<div><p>Do you want to stay signed in?</p></div>";
+      htmlContent += "<div><button id='btn-accept' class='btn btn-dark' data-action='session-timeout-keep-alive'>Keep me signed in</button></div>";
+
+      return htmlContent;
+    };
+
+    // CSP-safe delegated handler for the dynamically inserted "Keep me signed in" button
+    document.addEventListener('click', function (e) {
+      var target = e.target.closest('[data-action="session-timeout-keep-alive"]');
+      if (!target) { return; }
+      window.SessionTimeout.resetTimeoutTimer(true);
+    });
+
+//]]>
+</script>
+
+
+
+		  <div id="wrapper">
+
+    <nav role="navigation">
+      <nav id="theme-sidemenu" class="navbar-default navbar-static-side" role="navigation" aria-label="Side Menu">
+  <div class="sidebar-collapse">
+    <ul class="nav metismenu" id="side-menu">
+
+      <li id="theme-header" class="padding-top-md">
+  <div class="px-1">
+    <div id="logo" class="logo text-center">
+      <a href="https://globohq.com/" aria-label="Logo link that returns to home screen"></a>
+    </div>
+
+    <ul class="list-unstyled">
+      <li class="nav-header text-center">
+        <div class="dropdown profile-element">
+          <span>
+              <img class="img-circle avatar" alt="Main Menu User Profile Picture" src="https://globo-active-storage-files.s3.amazonaws.com/js9d7zczaulow5pa3ubswd6qq9rw?response-content-disposition=inline%3B%20filename%3D%22Me%20portrait2.png%22%3B%20filename%2A%3DUTF-8%27%27Me%2520portrait2.png&amp;response-content-type=image%2Fpng&amp;x-amz-checksum-mode=ENABLED&amp;X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=REDACTED&amp;X-Amz-Date=REDACTED&amp;X-Amz-Expires=14400&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=REDACTED" />
+          </span>
+
+          <a data-bs-toggle="dropdown" class="dropdown-toggle" href="#" data-test-id="sidebar-profile-dropdown-toggle">
+            <span class="clear">
+              <span class="block m-t-xs truncate">
+                  <strong class="font-bold" aria-label="user@example.com">user@example.com<b class="caret"></b></strong>
+              </span>
+            </span>
+          </a>
+
+          <ul id="theme-user-nav-buttons" class="dropdown-menu animated fadeInRight m-t-xs">
+            <a class="dropdown-item" title="" href="/users/edit" data-test-id="sidebar-my-profile-link">
+              <i class="fa fa-user me-2"></i><span class="text">My Profile</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" title="" href="/users/sign_out" data-method="delete" data-test-id="sidebar-logout-link">
+              <i class="fa fa-share me-2"></i><span class="text">Logout</span>
+            </a>
+          </ul>
+
+        </div>
+
+        <div class="logo-element m-t-sm">
+            <a class="hint--top" aria-label="Profile" data-test-id="sidebar-profile-image-link" href="/users/edit"><img class="img-circle avatar" alt="User Profile Picture" src="https://globo-active-storage-files.s3.amazonaws.com/js9d7zczaulow5pa3ubswd6qq9rw?response-content-disposition=inline%3B%20filename%3D%22Me%20portrait2.png%22%3B%20filename%2A%3DUTF-8%27%27Me%2520portrait2.png&amp;response-content-type=image%2Fpng&amp;x-amz-checksum-mode=ENABLED&amp;X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=REDACTED&amp;X-Amz-Date=REDACTED&amp;X-Amz-Expires=14400&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=REDACTED" /></a>
+        </div>
+
+      </li>
+    </ul>
+  </div>
+</li>
+
+
+      <li class=" ">
+  <a href="https://globohq.com/" class="hint--right" aria-label="Home"
+
+     >
+
+    <i class="fa fa-home fa fa-fw fa-solid"></i>
+    <span>Home</span>
+  </a>
+</li>
+
+
+        <!--suppress RubyScope -->
+
+        <!-- Executive Dashboards -->
+        <!-- //Executive Dashboards -->
+
+        
+	<!-- Client Reports -->
+	<!-- //Client Reports -->
+
+	<!-- CALL DETAILS -->
+	<!-- //CALL DETAILS -->
+
+	<!-- MY CALL REPORTS -->
+	<!-- //MY CALL REPORTS -->
+
+
+
+
+	<li class="nav-title left-menu">Access</li>
+
+	<!-- TELEPHONE INTERPRETING -->
+		<li class=" ">
+  <a href="/linguist_dashboard/index" class="hint--right" aria-label="Linguist Dashboard"
+
+     >
+
+    <i class="fa fa-tachometer fa fa-fw fa-solid"></i>
+    <span>Linguist Dashboard</span>
+  </a>
+</li>
+
+	<!-- EPIC -->
+	<!-- //EPIC -->
+
+	<!--	VIDEO INTERPRETING -->
+	<!--	//VIDEO INTERPRETING -->
+
+	<!-- //TELEPHONE INTERPRETING -->
+
+	<!-- ASSIGNMENTS -->
+	<!-- //ASSIGNMENTS -->
+
+	<!-- ON-DEMAND TRANSLATION -->
+	<!-- //ON-DEMAND TRANSLATION -->
+
+	<!-- SCHEDULED CALLS -->
+		<li class=" ">
+  <a href="/scheduled_calls" class="hint--right" aria-label="Scheduled Calls"
+
+     >
+
+    <i class="fa fa-solid fa-calendar-days fa fa-fw fa-solid"></i>
+    <span>Scheduled Calls</span>
+  </a>
+</li>
+	<!-- //SCHEDULED CALLS -->
+
+	<!-- ON-SITE INTERPRETING -->
+	<!-- //ON-SITE INTERPRETING -->
+
+	<!-- DOCUMENT TRANSLATION -->
+	<!-- //DOCUMENT TRANSLATION -->
+
+	<!-- FLUENCY TESTING -->
+	<!-- //FLUENCY TESTING -->
+
+
+
+
+	<li class="nav-title left-menu">Admin</li>
+
+	<!-- COMPANY USER MANAGEMENT -->
+	<!-- //COMPANY USER MANAGEMENT -->
+
+	<!-- INVOICES -->
+	<!--//INVOICES -->
+
+  <!-- REAL TIME DASHBOARDS -->
+	<!-- //REAL TIME DASHBOARDS -->
+
+	<!-- SCHEDULED CALL DASHBOARD -->
+	<!-- //SCHEDULED CALL DASHBOARD -->
+
+	<!-- MESSAGING -->
+	<!-- //MESSAGING -->
+
+
+	<!-- ASSIGNMENT ROUTER DASHBOARD -->
+	<!-- //ASSIGNMENT ROUTER DASHBOARD -->
+
+	<!-- PLATFORM MANAGEMENT -->
+
+	<!-- //PLATFORM MANAGEMENT -->
+
+	<!-- ACCOUNTING -->
+	<!--//ACCOUNTING -->
+
+	<!-- REPORT DATA GENERATION -->
+
+	<!--//REPORT DATA GENERATION -->
+
+
+  <!--//LINGUIST SCHEDULING -->
+  
+  <!--//LINGUIST SCHEDULING -->
+
+
+
+	<!-- API DOCS (external / partner) -->
+	<!-- //API DOCS -->
+
+	<!-- DEVELOPERS -->
+	<!-- //DEVELOPERS-->
+
+	<!-- CALL HISTORY -->
+		<li class="">
+			<a href="#"><i class="fa fa-list" aria-label="Call History"></i>
+				<span>My Telephone Call History</span> <span class="bi arrow flip-arrow-horizontal"></span></a>
+			</a>
+			<ul class="nav nav-second-level collapse ">
+				<li class=" ">
+  <a href="/interpreter/monthly_minutes" class="hint--right" aria-label="TI Monthly Minutes"
+
+     >
+
+    <i class="fa fa-bar-chart fa fa-fw fa-solid"></i>
+    <span>TI Monthly Minutes</span>
+  </a>
+</li>
+				<li class=" ">
+  <a href="/interpreter/calls_index" class="hint--right" aria-label="TI Call Log"
+
+     >
+
+    <i class="fa fa-file-text-o fa fa-fw fa-solid"></i>
+    <span>TI Call Log</span>
+  </a>
+</li>
+			</ul>
+		</li>
+
+		<li class=" ">
+  <a href="/interpreter/video_calls_index" class="hint--right" aria-label="My Video Call History"
+
+     >
+
+    <i class="fa fa-file-text-o fa fa-fw fa-solid"></i>
+    <span>My Video Call History</span>
+  </a>
+</li>
+
+    <li class=" ">
+  <a href="/interpreter/assignments_index" class="hint--right" aria-label="My Assignment History"
+
+     >
+
+    <i class="fa fa-file-text-o fa fa-fw fa-solid"></i>
+    <span>My Assignment History</span>
+  </a>
+</li>
+	<!-- //CALL HISTORY-->
+
+  <!-- //INTERPRETER PAYMENT-->
+    <li class=" ">
+  <a href="/interpreter/payments_index" class="hint--right" aria-label="My Payments"
+
+     >
+
+    <i class="fa fa-money fa fa-fw fa-solid"></i>
+    <span>My Payments</span>
+  </a>
+</li>
+  <!-- //INTERPRETER PAYMENT-->
+
+
+
+
+<li class="nav-title left-menu">Help</li>
+
+<!-- Quality Assurance -->
+<!-- //Quality Assurance-->
+
+	<li class=" ">
+  <a href="/faq_sections" class="hint--right" aria-label="Resources"
+
+     >
+
+    <i class="fa fa-solid fa-books fa fa-fw fa-solid"></i>
+    <span>Resources</span>
+  </a>
+</li>
+
+
+
+
+<li id="powered_by" class="text-center">
+	<span>POWERED BY</span>
+	<img src="//d1cgjlloec4635.cloudfront.net/assets/logo.globo-0f131f43d42dda353c059efba626602e3937aa47034cc1ab056717da3ad55448.png" />
+</li>
+
+
+
+
+<style nonce="NLSABflS2TfuIb2QYmj9DQ==">
+  .nav-title.left-menu {
+    color: #a7b1c2;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding-left: 8px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+</style>
+
+
+
+
+<script nonce="NLSABflS2TfuIb2QYmj9DQ==">
+	window.onLoaded(function () {
+		$('#telephone').on('click', function () {
+			window.location = "/telephone_interpreting/index";
+			return false;
+		});
+
+	}, true);
+</script>
+
+    </ul>
+  </div>
+</nav>
+
+    </nav>
+
+    <div ng-controller="LastUpdatedTimeController" id="page-wrapper" class="gray-bg theme-main-content ">
+
+      <!-- Page wrapper -->
+      <header role="banner">
+        <div class="row border-bottom">
+	<nav id="theme-content-header" class="navbar navbar-static-top no-bottom-margin" role="navigation" aria-label="Content Header">
+		<div class="navbar-header">
+			<button id="side-menu-toggle" class="navbar-minimalize minimalize-styl-2 btn btn-primary" type="button" aria-label="Toggle Side Menu">
+				<i class="fa fa-bars"></i>
+			</button>
+
+		</div>
+		<ul class="nav navbar-top-links navbar-right">
+
+			<li>
+				<a title="" href="/users/sign_out" data-method="delete" data-test-id="topnav-logout-link">
+					<i class="fa fa-sign-out"></i> Log out
+				</a>
+			</li>
+		</ul>
+	</nav>
+</div>
+
+<style nonce="QMETG+1AnOqyMfzg/tk21Q==">
+  .navbar.no-bottom-margin {
+    margin-bottom: 0;
+  }
+</style>
+      </header>
+
+      <main role="main">
+        <div id="theme-breadcrumb" class="row wrapper border-bottom border-top white-bg page-heading">
+	<div class="col-lg-10">
+		<h2 id="header_target">
+				  My Profile
+
+		</h2>
+		<ol class="breadcrumb" id="breadcrumbs_target">
+				  <li class="breadcrumb-item">
+    <a href="/" title="Go to Home" class="tip-bottom"><i class="fa fa-home"></i> Home</a></li>
+  <li class="breadcrumb-item active"><a href="#">My Profile</a></li>
+
+		</ol>
+	</div>
+	<div class="col-lg-2">
+		
+	</div>
+</div>
+
+        <div id="main_target" class="wrapper wrapper-content">
+
+<!--TODO: Refactor this to re-use a single partial same as https://github.com/HelloGLOBO/globo-portal/blob/34b08dfc35ea2f8cef64c0c978a69be8e1ba12ed/app/views/profiles/show.html.erb#L18 instead of copy pasta-->
+<div class="row m-b-lg m-t-lg">
+  <div class="col-6">
+    <div class="profile-image" style="text-align: center; width: 175px;">
+      <img class="rounded-circle circle-border m-b-md ibox-shadow" style="width: 150px; height: 150px; margin-bottom: 10px;" alt="Profile Picture" src="https://globo-active-storage-files.s3.amazonaws.com/js9d7zczaulow5pa3ubswd6qq9rw?response-content-disposition=inline%3B%20filename%3D%22Me%20portrait2.png%22%3B%20filename%2A%3DUTF-8%27%27Me%2520portrait2.png&amp;response-content-type=image%2Fpng&amp;x-amz-checksum-mode=ENABLED&amp;X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=REDACTED&amp;X-Amz-Date=REDACTED&amp;X-Amz-Expires=14400&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=REDACTED" />
+<a style="margin-left: auto; margin-right: auto;" data-remote="true" href="/admin/user_management/100001/edit_profile_image.js">Edit</a>
+
+    </div>
+    <div class="profile-info" style="margin-left: 175px;">
+      <div class="">
+        <div>
+          <h2 class="">Test User</h2>
+          <h3>user@example.com</h3>
+          <h4>SH000</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6">
+    <table class="table m-b-xs main-bg-color">
+      <tbody>
+      <tr>
+        <td>Last Sign In <strong>11/01/2026 06:40:17 PM</strong></td>
+      </tr>
+      <tr>
+        <td>Locked <strong>Not Locked</strong></td>
+      </tr>
+      <tr>
+        <td>Time Zone <strong>Europe/Istanbul</strong></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<div class="tabs-container">
+  <div class="tabs-left">
+    <ul class="nav nav-tabs users-tabs sticky-top" id="user-profile-nav-tabs" role="tablist">
+      <li id="user-settings-tab" class="user-tab" role="presentation">
+        <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#user-settings-pane" role="tab" aria-controls="user-settings-pane">
+          <i class="fa fa-user"></i><br/> User Settings
+        </a>
+      </li>
+      <li id="endpoint-settings-tab" class="user-tab" role="presentation">
+        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#endpoint-settings-pane" role="tab" aria-controls="endpoint-settings-pane">
+          <i class="fa fa-phone"></i><br/> Endpoint Settings
+        </a>
+      </li>
+
+				<li id="interpreter-settings-tab" class="user-tab" role="presentation">
+					<a class="nav-link" data-bs-toggle="tab" data-bs-target="#interpreter-settings-pane" role="tab" aria-controls="interpreter-settings-pane">
+						<i class="fa fa-american-sign-language-interpreting"></i><br/> Interpreter Settings
+					</a>
+				</li>
+
+        <li id="payments-tab" class="user-tab" role="presentation">
+          <a class="nav-link" data-bs-toggle="tab" data-bs-target="#payments-pane" role="tab" aria-controls="payments-pane">
+            <i class="fa fa-usd"></i><br/> Payments
+          </a>
+        </li>
+
+        <li id="schedule-tab" class="user-tab" role="presentation">
+          <a class="nav-link" data-bs-toggle="tab" data-bs-target="#schedule-pane" role="tab" aria-controls="schedule-pane">
+            <i class="fa fa-calendar"></i><br/> Scheduling
+          </a>
+        </li>
+
+    </ul>
+
+    <div class="tab-content users-content">
+      <div id="user-settings-pane" class="tab-pane active" role="tabpanel" aria-labelledby="user-settings-tab">
+        <div class="panel-body">
+          <div class="settings-pane">
+  <div class="sticky-top">
+    <ul class="section-nav" id="user-settings-section-nav">
+      <li class="active" data-target-id="profile">
+        <a class="" data-scroll-container="#user-settings" data-scroll-on-click="#profile">Profile</a>
+      </li>
+      <li class="" data-target-id="account-info">
+        <a class="" data-scroll-container="#user-settings" data-scroll-on-click="#account-info">Account Information</a>
+      </li>
+      <li class="" data-target-id="agreements">
+        <a class="" data-scroll-container="#user-settings" data-scroll-on-click="#agreements">Agreements</a>
+      </li>
+    </ul>
+  </div>
+
+  <div id="user-settings" class="settings-pane-body" data-navigation-id="user-settings-section-nav">
+    <div class="col-8 offset-2 col-8">
+      <h1 id="profile" class="section-nav-header">Profile</h1>
+    </div>
+      <form class="form-horizontal" id="edit_profile_291715" action="/profiles/291715" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" autocomplete="off" /><input type="hidden" name="authenticity_token" value="TESTAUTHENTICITYTOKEN" autocomplete="off" />
+
+	
+
+	<div class="old-form-group row">
+		<label class="col-form-label col-2" for="profile_first_name">First name</label>
+		<div class="col-10">
+				Test 
+		</div>
+	</div>
+	<div class="old-form-group row">
+		<label class="col-form-label col-2" for="profile_last_name">Last name</label>
+		<div class="col-10">
+				User
+		</div>
+	</div>
+
+	<div class="old-form-group row">
+		<label class="col-form-label col-2" for="profile_gender">Gender</label>
+		<div class="col-10">
+				Male
+		</div>
+	</div>
+
+    <div class="old-form-group row">
+      <label class="col-2 col-form-label" for="profile_payment_method">Payment Method</label>
+      <div class="col-10">
+        Tipalti - International
+      </div>
+    </div>
+
+	
+		<div class="old-form-group row">
+			<label class="col-2 col-form-label" for="profile_time_zone">Time zone</label>
+			<div class="col-10">
+        <select class="form-control auto-select2" name="profile[user][time_zone]" id="profile_user_time_zone"><option value="">Please Select</option>
+<option value="Europe/Andorra">Europe - Andorra</option>
+<option value="Asia/Dubai">Asia - Dubai</option>
+<option value="Asia/Kabul">Asia - Kabul</option>
+<option value="America/Puerto_Rico">America - Puerto Rico</option>
+<option value="Europe/Tirane">Europe - Tirane</option>
+<option value="Asia/Yerevan">Asia - Yerevan</option>
+<option value="Africa/Lagos">Africa - Lagos</option>
+<option value="Antarctica/Casey">Antarctica - Casey</option>
+<option value="Antarctica/Davis">Antarctica - Davis</option>
+<option value="Antarctica/Mawson">Antarctica - Mawson</option>
+<option value="Antarctica/Palmer">Antarctica - Palmer</option>
+<option value="Antarctica/Rothera">Antarctica - Rothera</option>
+<option value="Antarctica/Troll">Antarctica - Troll</option>
+<option value="Asia/Urumqi">Asia - Urumqi</option>
+<option value="Pacific/Auckland">Pacific - Auckland</option>
+<option value="Pacific/Port_Moresby">Pacific - Port Moresby</option>
+<option value="Asia/Riyadh">Asia - Riyadh</option>
+<option value="America/Argentina/Buenos_Aires">America - Buenos Aires, Argentina</option>
+<option value="America/Argentina/Cordoba">America - Cordoba, Argentina</option>
+<option value="America/Argentina/Salta">America - Salta, Argentina</option>
+<option value="America/Argentina/Jujuy">America - Jujuy, Argentina</option>
+<option value="America/Argentina/Tucuman">America - Tucuman, Argentina</option>
+<option value="America/Argentina/Catamarca">America - Catamarca, Argentina</option>
+<option value="America/Argentina/La_Rioja">America - La Rioja, Argentina</option>
+<option value="America/Argentina/San_Juan">America - San Juan, Argentina</option>
+<option value="America/Argentina/Mendoza">America - Mendoza, Argentina</option>
+<option value="America/Argentina/San_Luis">America - San Luis, Argentina</option>
+<option value="America/Argentina/Rio_Gallegos">America - Rio Gallegos, Argentina</option>
+<option value="America/Argentina/Ushuaia">America - Ushuaia, Argentina</option>
+<option value="Pacific/Pago_Pago">Pacific - Pago Pago</option>
+<option value="Europe/Vienna">Europe - Vienna</option>
+<option value="Australia/Lord_Howe">Australia - Lord Howe</option>
+<option value="Antarctica/Macquarie">Antarctica - Macquarie</option>
+<option value="Australia/Hobart">Australia - Hobart</option>
+<option value="Australia/Melbourne">Australia - Melbourne</option>
+<option value="Australia/Sydney">Australia - Sydney</option>
+<option value="Australia/Broken_Hill">Australia - Broken Hill</option>
+<option value="Australia/Brisbane">Australia - Brisbane</option>
+<option value="Australia/Lindeman">Australia - Lindeman</option>
+<option value="Australia/Adelaide">Australia - Adelaide</option>
+<option value="Australia/Darwin">Australia - Darwin</option>
+<option value="Australia/Perth">Australia - Perth</option>
+<option value="Australia/Eucla">Australia - Eucla</option>
+<option value="Europe/Helsinki">Europe - Helsinki</option>
+<option value="Asia/Baku">Asia - Baku</option>
+<option value="Europe/Belgrade">Europe - Belgrade</option>
+<option value="America/Barbados">America - Barbados</option>
+<option value="Asia/Dhaka">Asia - Dhaka</option>
+<option value="Europe/Brussels">Europe - Brussels</option>
+<option value="Africa/Abidjan">Africa - Abidjan</option>
+<option value="Europe/Sofia">Europe - Sofia</option>
+<option value="Asia/Qatar">Asia - Qatar</option>
+<option value="Africa/Maputo">Africa - Maputo</option>
+<option value="Atlantic/Bermuda">Atlantic - Bermuda</option>
+<option value="Asia/Kuching">Asia - Kuching</option>
+<option value="America/La_Paz">America - La Paz</option>
+<option value="America/Noronha">America - Noronha</option>
+<option value="America/Belem">America - Belem</option>
+<option value="America/Fortaleza">America - Fortaleza</option>
+<option value="America/Recife">America - Recife</option>
+<option value="America/Araguaina">America - Araguaina</option>
+<option value="America/Maceio">America - Maceio</option>
+<option value="America/Bahia">America - Bahia</option>
+<option value="America/Sao_Paulo">America - Sao Paulo</option>
+<option value="America/Campo_Grande">America - Campo Grande</option>
+<option value="America/Cuiaba">America - Cuiaba</option>
+<option value="America/Santarem">America - Santarem</option>
+<option value="America/Porto_Velho">America - Porto Velho</option>
+<option value="America/Boa_Vista">America - Boa Vista</option>
+<option value="America/Manaus">America - Manaus</option>
+<option value="America/Eirunepe">America - Eirunepe</option>
+<option value="America/Rio_Branco">America - Rio Branco</option>
+<option value="America/Toronto">America - Toronto</option>
+<option value="Asia/Thimphu">Asia - Thimphu</option>
+<option value="Europe/Minsk">Europe - Minsk</option>
+<option value="America/Belize">America - Belize</option>
+<option value="America/St_Johns">America - St Johns</option>
+<option value="America/Halifax">America - Halifax</option>
+<option value="America/Glace_Bay">America - Glace Bay</option>
+<option value="America/Moncton">America - Moncton</option>
+<option value="America/Goose_Bay">America - Goose Bay</option>
+<option value="America/Iqaluit">America - Iqaluit</option>
+<option value="America/Winnipeg">America - Winnipeg</option>
+<option value="America/Resolute">America - Resolute</option>
+<option value="America/Rankin_Inlet">America - Rankin Inlet</option>
+<option value="America/Regina">America - Regina</option>
+<option value="America/Swift_Current">America - Swift Current</option>
+<option value="America/Edmonton">America - Edmonton</option>
+<option value="America/Cambridge_Bay">America - Cambridge Bay</option>
+<option value="America/Inuvik">America - Inuvik</option>
+<option value="America/Dawson_Creek">America - Dawson Creek</option>
+<option value="America/Fort_Nelson">America - Fort Nelson</option>
+<option value="America/Whitehorse">America - Whitehorse</option>
+<option value="America/Dawson">America - Dawson</option>
+<option value="America/Vancouver">America - Vancouver</option>
+<option value="America/Panama">America - Panama</option>
+<option value="America/Phoenix">America - Phoenix</option>
+<option value="Asia/Yangon">Asia - Yangon</option>
+<option value="Europe/Zurich">Europe - Zurich</option>
+<option value="Pacific/Rarotonga">Pacific - Rarotonga</option>
+<option value="America/Santiago">America - Santiago</option>
+<option value="America/Punta_Arenas">America - Punta Arenas</option>
+<option value="Pacific/Easter">Pacific - Easter</option>
+<option value="Asia/Shanghai">Asia - Shanghai</option>
+<option value="America/Bogota">America - Bogota</option>
+<option value="America/Costa_Rica">America - Costa Rica</option>
+<option value="America/Havana">America - Havana</option>
+<option value="Atlantic/Cape_Verde">Atlantic - Cape Verde</option>
+<option value="Asia/Bangkok">Asia - Bangkok</option>
+<option value="Asia/Nicosia">Asia - Nicosia</option>
+<option value="Asia/Famagusta">Asia - Famagusta</option>
+<option value="Europe/Prague">Europe - Prague</option>
+<option value="Europe/Berlin">Europe - Berlin</option>
+<option value="Africa/Nairobi">Africa - Nairobi</option>
+<option value="America/Santo_Domingo">America - Santo Domingo</option>
+<option value="Africa/Algiers">Africa - Algiers</option>
+<option value="America/Guayaquil">America - Guayaquil</option>
+<option value="Pacific/Galapagos">Pacific - Galapagos</option>
+<option value="Europe/Tallinn">Europe - Tallinn</option>
+<option value="Africa/Cairo">Africa - Cairo</option>
+<option value="Africa/El_Aaiun">Africa - El Aaiun</option>
+<option value="Europe/Madrid">Europe - Madrid</option>
+<option value="Africa/Ceuta">Africa - Ceuta</option>
+<option value="Atlantic/Canary">Atlantic - Canary</option>
+<option value="Pacific/Fiji">Pacific - Fiji</option>
+<option value="Atlantic/Stanley">Atlantic - Stanley</option>
+<option value="Pacific/Kosrae">Pacific - Kosrae</option>
+<option value="Pacific/Guadalcanal">Pacific - Guadalcanal</option>
+<option value="Atlantic/Faroe">Atlantic - Faroe</option>
+<option value="Europe/Paris">Europe - Paris</option>
+<option value="Europe/London">Europe - London</option>
+<option value="Asia/Tbilisi">Asia - Tbilisi</option>
+<option value="America/Cayenne">America - Cayenne</option>
+<option value="Europe/Gibraltar">Europe - Gibraltar</option>
+<option value="America/Nuuk">America - Nuuk</option>
+<option value="America/Danmarkshavn">America - Danmarkshavn</option>
+<option value="America/Scoresbysund">America - Scoresbysund</option>
+<option value="America/Thule">America - Thule</option>
+<option value="Europe/Athens">Europe - Athens</option>
+<option value="Atlantic/South_Georgia">Atlantic - South Georgia</option>
+<option value="America/Guatemala">America - Guatemala</option>
+<option value="Pacific/Guam">Pacific - Guam</option>
+<option value="Africa/Bissau">Africa - Bissau</option>
+<option value="America/Guyana">America - Guyana</option>
+<option value="Asia/Hong_Kong">Asia - Hong Kong</option>
+<option value="America/Tegucigalpa">America - Tegucigalpa</option>
+<option value="America/Port-au-Prince">America - Port-au-Prince</option>
+<option value="Europe/Budapest">Europe - Budapest</option>
+<option value="Asia/Jakarta">Asia - Jakarta</option>
+<option value="Asia/Pontianak">Asia - Pontianak</option>
+<option value="Asia/Makassar">Asia - Makassar</option>
+<option value="Asia/Jayapura">Asia - Jayapura</option>
+<option value="Europe/Dublin">Europe - Dublin</option>
+<option value="Asia/Jerusalem">Asia - Jerusalem</option>
+<option value="Asia/Kolkata">Asia - Kolkata</option>
+<option value="Indian/Chagos">Indian - Chagos</option>
+<option value="Asia/Baghdad">Asia - Baghdad</option>
+<option value="Asia/Tehran">Asia - Tehran</option>
+<option value="Europe/Rome">Europe - Rome</option>
+<option value="America/Jamaica">America - Jamaica</option>
+<option value="Asia/Amman">Asia - Amman</option>
+<option value="Asia/Tokyo">Asia - Tokyo</option>
+<option value="Asia/Bishkek">Asia - Bishkek</option>
+<option value="Pacific/Tarawa">Pacific - Tarawa</option>
+<option value="Pacific/Kanton">Pacific - Kanton</option>
+<option value="Pacific/Kiritimati">Pacific - Kiritimati</option>
+<option value="Asia/Pyongyang">Asia - Pyongyang</option>
+<option value="Asia/Seoul">Asia - Seoul</option>
+<option value="Asia/Almaty">Asia - Almaty</option>
+<option value="Asia/Qyzylorda">Asia - Qyzylorda</option>
+<option value="Asia/Qostanay">Asia - Qostanay</option>
+<option value="Asia/Aqtobe">Asia - Aqtobe</option>
+<option value="Asia/Aqtau">Asia - Aqtau</option>
+<option value="Asia/Atyrau">Asia - Atyrau</option>
+<option value="Asia/Oral">Asia - Oral</option>
+<option value="Asia/Beirut">Asia - Beirut</option>
+<option value="Asia/Colombo">Asia - Colombo</option>
+<option value="Africa/Monrovia">Africa - Monrovia</option>
+<option value="Africa/Johannesburg">Africa - Johannesburg</option>
+<option value="Europe/Vilnius">Europe - Vilnius</option>
+<option value="Europe/Riga">Europe - Riga</option>
+<option value="Africa/Tripoli">Africa - Tripoli</option>
+<option value="Africa/Casablanca">Africa - Casablanca</option>
+<option value="Europe/Chisinau">Europe - Chisinau</option>
+<option value="Pacific/Kwajalein">Pacific - Kwajalein</option>
+<option value="Asia/Ulaanbaatar">Asia - Ulaanbaatar</option>
+<option value="Asia/Hovd">Asia - Hovd</option>
+<option value="Asia/Choibalsan">Asia - Choibalsan</option>
+<option value="Asia/Macau">Asia - Macau</option>
+<option value="America/Martinique">America - Martinique</option>
+<option value="Europe/Malta">Europe - Malta</option>
+<option value="Indian/Mauritius">Indian - Mauritius</option>
+<option value="Indian/Maldives">Indian - Maldives</option>
+<option value="America/Mexico_City">America - Mexico City</option>
+<option value="America/Cancun">America - Cancun</option>
+<option value="America/Merida">America - Merida</option>
+<option value="America/Monterrey">America - Monterrey</option>
+<option value="America/Matamoros">America - Matamoros</option>
+<option value="America/Chihuahua">America - Chihuahua</option>
+<option value="America/Ciudad_Juarez">America - Ciudad Juarez</option>
+<option value="America/Ojinaga">America - Ojinaga</option>
+<option value="America/Mazatlan">America - Mazatlan</option>
+<option value="America/Bahia_Banderas">America - Bahia Banderas</option>
+<option value="America/Hermosillo">America - Hermosillo</option>
+<option value="America/Tijuana">America - Tijuana</option>
+<option value="Asia/Singapore">Asia - Singapore</option>
+<option value="Africa/Windhoek">Africa - Windhoek</option>
+<option value="Pacific/Noumea">Pacific - Noumea</option>
+<option value="Pacific/Norfolk">Pacific - Norfolk</option>
+<option value="America/Managua">America - Managua</option>
+<option value="Asia/Kathmandu">Asia - Kathmandu</option>
+<option value="Pacific/Nauru">Pacific - Nauru</option>
+<option value="Pacific/Niue">Pacific - Niue</option>
+<option value="Pacific/Chatham">Pacific - Chatham</option>
+<option value="America/Lima">America - Lima</option>
+<option value="Pacific/Tahiti">Pacific - Tahiti</option>
+<option value="Pacific/Marquesas">Pacific - Marquesas</option>
+<option value="Pacific/Gambier">Pacific - Gambier</option>
+<option value="Pacific/Bougainville">Pacific - Bougainville</option>
+<option value="Asia/Manila">Asia - Manila</option>
+<option value="Asia/Karachi">Asia - Karachi</option>
+<option value="Europe/Warsaw">Europe - Warsaw</option>
+<option value="America/Miquelon">America - Miquelon</option>
+<option value="Pacific/Pitcairn">Pacific - Pitcairn</option>
+<option value="Asia/Gaza">Asia - Gaza</option>
+<option value="Asia/Hebron">Asia - Hebron</option>
+<option value="Europe/Lisbon">Europe - Lisbon</option>
+<option value="Atlantic/Madeira">Atlantic - Madeira</option>
+<option value="Atlantic/Azores">Atlantic - Azores</option>
+<option value="Pacific/Palau">Pacific - Palau</option>
+<option value="America/Asuncion">America - Asuncion</option>
+<option value="Europe/Bucharest">Europe - Bucharest</option>
+<option value="Europe/Kaliningrad">Europe - Kaliningrad</option>
+<option value="Europe/Moscow">Europe - Moscow</option>
+<option value="Europe/Simferopol">Europe - Simferopol</option>
+<option value="Europe/Kirov">Europe - Kirov</option>
+<option value="Europe/Volgograd">Europe - Volgograd</option>
+<option value="Europe/Astrakhan">Europe - Astrakhan</option>
+<option value="Europe/Saratov">Europe - Saratov</option>
+<option value="Europe/Ulyanovsk">Europe - Ulyanovsk</option>
+<option value="Europe/Samara">Europe - Samara</option>
+<option value="Asia/Yekaterinburg">Asia - Yekaterinburg</option>
+<option value="Asia/Omsk">Asia - Omsk</option>
+<option value="Asia/Novosibirsk">Asia - Novosibirsk</option>
+<option value="Asia/Barnaul">Asia - Barnaul</option>
+<option value="Asia/Tomsk">Asia - Tomsk</option>
+<option value="Asia/Novokuznetsk">Asia - Novokuznetsk</option>
+<option value="Asia/Krasnoyarsk">Asia - Krasnoyarsk</option>
+<option value="Asia/Irkutsk">Asia - Irkutsk</option>
+<option value="Asia/Chita">Asia - Chita</option>
+<option value="Asia/Yakutsk">Asia - Yakutsk</option>
+<option value="Asia/Khandyga">Asia - Khandyga</option>
+<option value="Asia/Vladivostok">Asia - Vladivostok</option>
+<option value="Asia/Ust-Nera">Asia - Ust-Nera</option>
+<option value="Asia/Magadan">Asia - Magadan</option>
+<option value="Asia/Sakhalin">Asia - Sakhalin</option>
+<option value="Asia/Srednekolymsk">Asia - Srednekolymsk</option>
+<option value="Asia/Kamchatka">Asia - Kamchatka</option>
+<option value="Asia/Anadyr">Asia - Anadyr</option>
+<option value="Africa/Khartoum">Africa - Khartoum</option>
+<option value="America/Paramaribo">America - Paramaribo</option>
+<option value="Africa/Juba">Africa - Juba</option>
+<option value="Africa/Sao_Tome">Africa - Sao Tome</option>
+<option value="America/El_Salvador">America - El Salvador</option>
+<option value="Asia/Damascus">Asia - Damascus</option>
+<option value="America/Grand_Turk">America - Grand Turk</option>
+<option value="Africa/Ndjamena">Africa - Ndjamena</option>
+<option value="Asia/Dushanbe">Asia - Dushanbe</option>
+<option value="Pacific/Fakaofo">Pacific - Fakaofo</option>
+<option value="Asia/Dili">Asia - Dili</option>
+<option value="Asia/Ashgabat">Asia - Ashgabat</option>
+<option value="Africa/Tunis">Africa - Tunis</option>
+<option value="Pacific/Tongatapu">Pacific - Tongatapu</option>
+<option selected="selected" value="Europe/Istanbul">Europe - Istanbul</option>
+<option value="Asia/Taipei">Asia - Taipei</option>
+<option value="Europe/Kyiv">Europe - Kyiv</option>
+<option value="America/New_York">America - New York</option>
+<option value="America/Detroit">America - Detroit</option>
+<option value="America/Kentucky/Louisville">America - Louisville, Kentucky</option>
+<option value="America/Kentucky/Monticello">America - Monticello, Kentucky</option>
+<option value="America/Indiana/Indianapolis">America - Indianapolis, Indiana</option>
+<option value="America/Indiana/Vincennes">America - Vincennes, Indiana</option>
+<option value="America/Indiana/Winamac">America - Winamac, Indiana</option>
+<option value="America/Indiana/Marengo">America - Marengo, Indiana</option>
+<option value="America/Indiana/Petersburg">America - Petersburg, Indiana</option>
+<option value="America/Indiana/Vevay">America - Vevay, Indiana</option>
+<option value="America/Chicago">America - Chicago</option>
+<option value="America/Indiana/Tell_City">America - Tell City, Indiana</option>
+<option value="America/Indiana/Knox">America - Knox, Indiana</option>
+<option value="America/Menominee">America - Menominee</option>
+<option value="America/North_Dakota/Center">America - Center, North Dakota</option>
+<option value="America/North_Dakota/New_Salem">America - New Salem, North Dakota</option>
+<option value="America/North_Dakota/Beulah">America - Beulah, North Dakota</option>
+<option value="America/Denver">America - Denver</option>
+<option value="America/Boise">America - Boise</option>
+<option value="America/Los_Angeles">America - Los Angeles</option>
+<option value="America/Anchorage">America - Anchorage</option>
+<option value="America/Juneau">America - Juneau</option>
+<option value="America/Sitka">America - Sitka</option>
+<option value="America/Metlakatla">America - Metlakatla</option>
+<option value="America/Yakutat">America - Yakutat</option>
+<option value="America/Nome">America - Nome</option>
+<option value="America/Adak">America - Adak</option>
+<option value="Pacific/Honolulu">Pacific - Honolulu</option>
+<option value="America/Montevideo">America - Montevideo</option>
+<option value="Asia/Samarkand">Asia - Samarkand</option>
+<option value="Asia/Tashkent">Asia - Tashkent</option>
+<option value="America/Caracas">America - Caracas</option>
+<option value="Asia/Ho_Chi_Minh">Asia - Ho Chi Minh</option>
+<option value="Pacific/Efate">Pacific - Efate</option>
+<option value="Pacific/Apia">Pacific - Apia</option></select>
+      </div>
+		</div>
+
+		<div class="old-form-group row">
+      <label class="col-2 col-form-label" for="mobile_session_timeout">Mobile session timeout</label>
+			<div class="col-10">
+				<input type="checkbox" name="mobile_session_timeout" id="mobile_session_timeout" value="true" class="form-control i-checks" />
+				<input class="form-control half-width ms-2 hide" min="1" type="number" name="profile[user][mobile_api_session_length]" id="profile_user_mobile_api_session_length" />
+				<span class="form-text">
+					If enabled, the number of minutes of inactivity that will result in the user's session on mobile being timed out.
+				</span>
+			</div>
+		</div>
+
+
+	<div class="old-form-group row">
+		<label class="col-2 col-form-label" for="profile_home_address">Home address</label>
+		<div class="col-10">
+			<select class="form-control auto-select2" name="profile[home_address_id]" id="profile_home_address_id"><option value="">Please Select</option>
+</select>
+			<span class="form-text">
+        Click <a href="/users/addresses" class="underline-link">here</a> to manage your addresses.
+      </span>
+		</div>
+	</div>
+
+
+	<div class="hr-line-dashed"></div>
+
+	<div class="old-form-group row">
+		<div class="col-4 offset-2">
+			<input type="submit" name="commit" value="Update" class="btn btn-primary" />
+		</div>
+	</div>
+</form>
+
+<style nonce="QMETG+1AnOqyMfzg/tk21Q==">
+  .underline-link {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    <div class="col-8 offset-2">
+      <h1 id="account-info" class="section-nav-header">Account Information</h1>
+    </div>
+    <form class="form-horizontal" id="edit_user" action="/users" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="put" autocomplete="off" /><input type="hidden" name="authenticity_token" value="TESTAUTHENTICITYTOKEN" autocomplete="off" />
+
+	
+
+	<div class="old-form-group row">
+		<label class="col-2 col-form-label" for="user_email">Email</label>
+		<div class="col-10">
+			<label class="col-form-label">user@example.com</label>
+		</div>
+	</div>
+
+	<div class="old-form-group row">
+		<label class="col-2 col-form-label" for="user_Interpreter ID">Interpreter id</label>
+		<div class="col-10">
+			<label class="col-form-label">SH000</label>
+		</div>
+	</div>
+
+	<div class="old-form-group row">
+		<label class="col-2 col-form-label" for="user_password">New Password</label>
+		<div class="col-10">
+			<input autocomplete="off" class="form-control" type="password" name="user[password]" id="user_password" />
+			<span class="form-text">leave blank if you don't want to change it</span>
+			<div id="passwordComplexity"></div>
+		</div>
+	</div>
+
+	<div class="old-form-group row">
+		<label class="col-2 col-form-label" for="user_password_confirmation">Confirm New Password</label>
+		<div class="col-10">
+			<input class="form-control" type="password" name="user[password_confirmation]" id="user_password_confirmation" />
+		</div>
+	</div>
+
+	<div class="old-form-group row">
+		<label class="col-2 col-form-label" for="user_current_password">Current password</label>
+		<div class="col-10">
+			<input class="form-control" type="password" name="user[current_password]" id="user_current_password" />
+			<span class="form-text">
+        we need your current password to confirm your changes
+      </span>
+		</div>
+	</div>
+
+
+	<div class="current_user" data-temp="Update" data-password-policy-enabled="false">
+</div>
+
+	<div class="hr-line-dashed"></div>
+
+	<div class="old-form-group row">
+		<div class="col-4 offset-2">
+			<input type="submit" name="update_user_registration" value="Update" class="btn btn-primary" id="update-password" />
+		</div>
+	</div>
+
+</form>
+<script src="//d1cgjlloec4635.cloudfront.net/assets/passwordRulesValidator-custom-9db0a69d021203f7d75a6b2f6a10b42d9854d0f0ea8416cfe57beb181e33c754.js" nonce="QMETG+1AnOqyMfzg/tk21Q=="></script>
+
+
+    <div class="offset-12">
+      <h1 id="agreements" class="section-nav-header">Agreements</h1>
+    </div>
+    
+
+  </div>
+</div>
+
+        </div>
+      </div>
+      <div id="endpoint-settings-pane" class="tab-pane" role="tabpanel" aria-labelledby="endpoint-settings-tab">
+        <div class="panel-body">
+          <div class="settings-pane">
+  <div class="sticky-top">
+    <ul class="section-nav" id="endpoint-settings-section-nav">
+      <li class="active" data-target-id="current-endpoint">
+        <a class="" data-scroll-container="#endpoint-settings" data-scroll-on-click="#current-endpoint">Current Endpoints</a>
+      </li>
+      <li class="" data-target-id="endpoints">
+        <a class="" data-scroll-container="#endpoint-settings" data-scroll-on-click="#endpoints">Endpoints</a>
+      </li>
+    </ul>
+  </div>
+  <div id="endpoint-settings" class="settings-pane-body" data-navigation-id="endpoint-settings-section-nav">
+    <div class="offset-sm-2 col-sm-8">
+      <h1 id="current-endpoint" class="section-nav-header">Current Endpoint</h1>
+    </div>
+
+      <form class="form-horizontal" id="edit_current_endpoint_295946" action="/current_endpoints/295946?target_resource=100001" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" autocomplete="off" /><input type="hidden" name="authenticity_token" value="TESTAUTHENTICITYTOKEN" autocomplete="off" />
+	
+
+	<div class="old-form-group row">
+		<label class="col-form-label col-sm-2" for="current_endpoint_endpoint_id">Current Endpoint (Preferred Endpoint)</label>
+		<div class="col-sm-10">
+			<select class="form-control auto-select2" name="current_endpoint[endpoint_id]" id="current_endpoint_endpoint_id"><option value="">Please Select</option>
+<option selected="selected" value="310001">Browser Client (SH000)</option></select>
+		</div>
+	</div>
+	<div class="old-form-group row">
+		<label class="col-form-label col-sm-2" for="current_endpoint_notification_endpoint_id">Mobile Endpoint</label>
+		<div class="col-sm-10">
+			<select class="form-control auto-select2" name="current_endpoint[notification_endpoint_id]" id="current_endpoint_notification_endpoint_id"><option value="">Please Select</option>
+<option selected="selected" value="310002">Test User (+90 555 000 00 00)</option></select>
+		</div>
+	</div>
+
+	<div class="hr-line-dashed"></div>
+
+	<div class="old-form-group">
+		<div class="col-sm-4 offset-sm-2">
+			<input type="submit" name="commit" value="Update" class="btn btn-primary btn-request" data-test-id="current-endpoint-form-submit-button" />
+		</div>
+	</div>
+</form>
+
+    <div class="offset-sm-12">
+      <h1 id="endpoints" class="section-nav-header">Endpoints</h1>
+    </div>
+    
+<div id="browser-client-status">
+		<p><span class="label label-info">Browser Client Enabled</span></p>
+</div>
+
+<table class="table table-striped">
+	<tr>
+		<th>Name</th>
+		<th>Number</th>
+		<th>Type</th>
+		<th>City</th>
+		<th>State</th>
+		<th>Country</th>
+		<th>Carrie</th>
+		<th>Line Type</th>
+		<th>Unstable</th>
+		<th>Allowed</th>
+			<th></th>
+	</tr>
+
+			<tr data-test-id="endpoint-row">
+				<td>Test User</td>
+				<td>+90 555 000 00 00</td>
+				<td>Mobile</td>
+
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+
+				<td><i class="fa fa-square-o"></i></td>
+				<td><i class="fa fa-square-o"></i></td>
+
+					<td class="text-end">
+						<a data-confirm="Are you sure?" data-test-id="delete-endpoint-button" class="btn btn-outline btn-danger btn-sm" rel="nofollow" data-method="delete" href="/endpoints/310002?target_resource=100001"><i class="fa fa-trash-o"></i> Delete</a>
+					</td>
+			</tr>
+</table>
+
+	<a class="btn btn-primary" href="/endpoints/new?endpoint%5Buser_id%5D=100001&amp;target_resource=100001">New Endpoint</a>
+
+
+<script nonce="QMETG+1AnOqyMfzg/tk21Q==">
+//<![CDATA[
+
+	window.onLoaded(function () {
+		window.showBrowserClientStatus = function (enabled) {
+			// CSP-safe: no inline onclick — handler is delegated below
+			if (enabled) {
+				$('#browser-client-status').html('<p>Browser Client Enabled <button class="btn btn-outline btn-info js-browser-client-toggle" data-enable="false" type="button">Disable Browser Client</button></p>');
+			}
+			else {
+				$('#browser-client-status').html('<p>Browser Client Disabled <button class="btn btn-outline btn-info js-browser-client-toggle" data-enable="true" type="button">Enable Browser Client</button></p>');
+			}
+		};
+
+		// CSP-safe delegated handler for the dynamically inserted toggle button
+		$(document).on('click', '.js-browser-client-toggle', function (e) {
+			e.preventDefault();
+			var enable = this.getAttribute('data-enable') === 'true';
+			window.setBrowserClientEnabled(enable);
+		});
+
+		window.setBrowserClientEnabled = function (enable) {
+			var url = '/endpoints/100001/';
+			if (enable) {
+				url += 'enable_browser_client.json';
+			} else {
+				url += 'disable_browser_client.json';
+			}
+
+			$.get(url, function (data) {
+				showBrowserClientStatus(data.enabled);
+			});
+		}
+
+	});
+
+//]]>
+</script>
+
+  </div>
+</div>
+
+        </div>
+      </div>
+
+      <div id="interpreter-settings-pane" class="tab-pane" role="tabpanel" aria-labelledby="interpreter-settings-tab">
+        <div class="panel-body">
+          <div class="settings-pane">
+  <div class="sticky-top">
+    <ul class="section-nav" id="interpreter-settings-section-nav">
+        <li class="active" data-target-id="languages">
+          <a class="" data-scroll-container="#interpreter-settings" data-scroll-on-click="#languages">Languages</a>
+        </li>
+      <li class="" data-target-id="education">
+        <a class="" data-scroll-container="#interpreter-settings" data-scroll-on-click="#education">Education</a>
+      </li>
+      <li class="" data-target-id="expertise">
+        <a class="" data-scroll-container="#interpreter-settings" data-scroll-on-click="#expertise">Expertise</a>
+      </li>
+      <li class="" data-target-id="vaccinations">
+        <a class="" data-scroll-container="#interpreter-settings" data-scroll-on-click="#vaccinations">Vaccinations</a>
+      </li>
+    </ul>
+  </div>
+
+  <div id="interpreter-settings" class="settings-pane-body" data-navigation-id="interpreter-settings-section-nav">
+      <div class="offset-12">
+        <h1 id="languages" class="section-nav-header">Languages</h1>
+      </div>
+      <table class="table table-striped">
+	<tr>
+		<th>Name</th>
+		<th></th>
+	</tr>
+
+		<tr data-test-id="user-language-row">
+			<td>Farsi</td>
+			<td class="text-end">
+				
+				
+			</td>
+		</tr>
+		</tr>
+</table>
+
+
+
+
+
+    <div class="offset-12">
+      <h1 id="education" class="section-nav-header">Education</h1>
+    </div>
+    
+
+    <div class="offset-12">
+      <h1 id="expertise" class="section-nav-header">Expertise</h1>
+    </div>
+    
+
+    <div class="offset-12">
+      <h1 id="vaccinations" class="section-nav-header">Vaccinations</h1>
+    </div>
+    
+
+  </div>
+</div>
+
+        </div>
+      </div>
+
+        <div id="payments-pane" class="tab-pane" role="tabpanel" aria-labelledby="payments-tab">
+          <div class="panel-body">
+            
+<div class="settings-pane">
+  <div class="sticky-top">
+    <ul class="section-nav" id="payments-section-nav">
+
+
+        <li class="" data-target-id="payment_settings">
+          <a class="payments-section-link" href="#payment_settings" data-scroll-container="#payments" data-scroll-on-click="#payment_settings">Payment Settings</a>
+        </li>
+        <li class="" data-target-id="tipalti_invoice_history">
+          <a class="payments-section-link" href="#tipalti_invoice_history" data-scroll-container="#payments" data-scroll-on-click="#tipalti_invoice_history">Tipalti Invoice History</a>
+        </li>
+        <li class="" data-target-id="tipalti_payment_history">
+          <a class="payments-section-link" href="#tipalti_payment_history" data-scroll-container="#payments" data-scroll-on-click="#tipalti_payment_history">Tipalti Payment History</a>
+        </li>
+    </ul>
+  </div>
+
+    <div id="payments" class="settings-pane-body" data-navigation-id="payments-section-nav">
+
+
+
+        <div class="mt-5 mb-1">
+          <h1 id="payment_settings" class="section-nav-header">Payment Settings</h1>
+
+          <iframe class="w-100 tipalti-iframe-tall" src="https://ui2.tipalti.com/PayeeDashboard/home?payer=GLOBO&amp;idap=SH000&amp;ts=1000000000&amp;hashkey=REDACTED"></iframe>
+
+          <div class="hr-line-dashed"></div>
+        </div>
+        <div class="mt-5 mb-1">
+          <h1 id="tipalti_invoice_history" class="section-nav-header">Tipalti Invoice History</h1>
+
+          <iframe class="w-100 tipalti-iframe-short" src="https://ui2.tipalti.com/PayeeDashboard/Invoices?payer=GLOBO&amp;idap=SH000&amp;ts=1000000000&amp;hashkey=REDACTED"></iframe>
+
+          <div class="hr-line-dashed"></div>
+        </div>
+        <div class="mt-5 mb-1">
+          <h1 id="tipalti_payment_history" class="section-nav-header">Tipalti Payment History</h1>
+
+          <iframe class="w-100 tipalti-iframe-short" src="https://ui2.tipalti.com/PayeeDashboard/PaymentsHistory?payer=GLOBO&amp;idap=SH000&amp;ts=1000000000&amp;hashkey=REDACTED"></iframe>
+
+          <div class="hr-line-dashed"></div>
+        </div>
+
+    </div>
+
+</div>
+
+
+          </div>
+        </div>
+
+        <div id="schedule-pane" class="tab-pane" role="tabpanel" aria-labelledby="schedule-tab">
+          <div class="panel-body">
+            
+
+<div class="settings-pane">
+  <div class="sticky-top">
+    <ul class="section-nav" id="scheduling-section-nav">
+      <li class="active" data-target-id="hourly-schedule">
+        <a class="" data-scroll-container="#scheduling" data-scroll-on-click="#hourly-schedule">Hourly
+          Schedule</a>
+      </li>
+      <li class="" data-target-id="standby-schedule">
+        <a class="" data-scroll-container="#scheduling" data-scroll-on-click="#standby-schedule">Standby
+          Schedule</a>
+      </li>
+    </ul>
+  </div>
+
+  <div id="scheduling" class="settings-pane-body" data-navigation-id="scheduling-section-nav">
+    <div class="hourly-schedule-container">
+      <div class="offset-12">
+        <h1 id="hourly-schedule" class="section-nav-header">Hourly Schedule</h1>
+      </div>
+      <div>
+
+	<div class="tab-content">
+		<span class="lead">Please use the left tab to indicate your "General Availability" and the right tab to adjust your schedule week to week.</span>
+
+		<ul class="nav nav-tabs">
+			<li class="nav-item">
+				<a href="#hourly-default-schedule-pane" data-bs-target="#hourly-default-schedule-pane" data-bs-toggle="tab" class="nav-link active" data-test-id="tab-general-availability">My General Availability</a>
+			</li>
+			<li class="nav-item">
+				<a href="#hourly-exception-schedule-pane" data-bs-target="#hourly-exception-schedule-pane" data-bs-toggle="tab" class="nav-link" data-test-id="tab-customize-availability">Customize My Availability</a>
+			</li>
+		</ul>
+
+		<div class="tab-content">
+			<div class="tab-pane active fade in" id="hourly-default-schedule-pane">
+				<div id="hourly_schedule_grid_component" class=""></div>
+<script nonce="QMETG+1AnOqyMfzg/tk21Q==">
+//<![CDATA[
+
+  window.onLoaded(function () {
+	  window.renderComponent("hourly_schedule_grid_component", "HourlyScheduleGrid", {"user_id":100001,"schedules":{"18":[1,2,3,4,5],"19":[1,2,3,4,5],"20":[1,2,3,4,5],"21":[1,2,3,4,5],"22":[1,2,3,4,5],"23":[1,2,3,4,5]}})
+  }, true);
+
+//]]>
+</script>
+			</div>
+
+			<div class="tab-pane" id="hourly-exception-schedule-pane">
+				<div id="hourly_schedule_exceptions_grid_component" class=""></div>
+<script nonce="QMETG+1AnOqyMfzg/tk21Q==">
+//<![CDATA[
+
+  window.onLoaded(function () {
+	  window.renderComponent("hourly_schedule_exceptions_grid_component", "HourlyScheduleExceptionsGrid", {"user_id":100001,"today":"2026-11-01T15:43:47.377+00:00","schedules":{"18":[1,2,3,4,5],"19":[1,2,3,4,5],"20":[1,2,3,4,5],"21":[1,2,3,4,5],"22":[1,2,3,4,5],"23":[1,2,3,4,5]},"exception_schedules":{}})
+  }, true);
+
+//]]>
+</script>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+
+<script nonce="QMETG+1AnOqyMfzg/tk21Q==">
+//<![CDATA[
+
+	window.onLoaded(function () {
+		// $(function () {
+		// 	var isMouseDown = false,
+		// 		isHighlighted;
+		// 	$(".hourly-default-schedule td, .hourly-exception-schedule td")
+		// 		.mousedown(function () {
+		// 			isMouseDown = true;
+		// 			$(this).parent().find('td').removeClass('highlighted');
+		// 			$(this).toggleClass("highlighted");
+		// 			isHighlighted = $(this).hasClass("highlighted");
+		// 			return false; // prevent text selection
+		// 		})
+		// 		.mouseover(function () {
+		// 			if (isMouseDown) {
+		// 				$(this).toggleClass("highlighted", isHighlighted);
+		// 			}
+		// 		});
+		//
+		// 	$(".hourly-default-schedule td, .hourly-exception-schedule td")
+		// 		.mouseup(function () {
+		// 			isMouseDown = false;
+		// 			var td = $('td.highlighted').get(0);
+		// 			if (td && $('td.highlighted').length > 1) {
+		// 				var element = $(td).parents('[ng-controller]').get(0);
+		// 				var _scope = angular.element(element).scope();
+		// 				console.log('Hourly Schedules', _scope);
+		// 				_scope.saveBulkData();
+		// 			} else {
+		// 				$('td.highlighted').removeClass('highlighted');
+		// 			}
+		// 		});
+		// });
+
+	}, true);
+
+//]]>
+</script>
+    </div>
+
+    <div class="offset-12">
+      <h1 id="standby-schedule" class="section-nav-header">Standby Schedule</h1>
+    </div>
+    
+
+  </div>
+</div>
+
+
+<style nonce="QMETG+1AnOqyMfzg/tk21Q==">
+  .hourly-schedule-container {
+    margin-bottom: 575px;
+  }
+</style>
+
+          </div>
+        </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+<!-- TODO: move to portal style -->
+<style nonce="QMETG+1AnOqyMfzg/tk21Q==">
+  .nav-tabs > li > a {
+    color: #263E66;
+  }
+
+  .nav-tabs > li.active > a {
+    color: #000000 !important;
+  }
+
+  .nav-tabs > li > a:hover {
+    color: #000000 !important;
+  }
+
+  .ui-state-focus,
+  .ui-state-hover,
+  .ui-state-active{
+    outline: none !important;
+  }
+
+  .nav-link {
+    outline: none;
+  }
+
+  .tabs-container .tabs-left > .nav-tabs a.active, .tabs-container .tabs-left > .nav-tabs a.active:hover, .tabs-container .tabs-left > .nav-tabs a.active:focus {
+    margin-left: 2px !important;
+  }
+</style>
+
+
+<script nonce="QMETG+1AnOqyMfzg/tk21Q==">
+	const KEY_UP = 38;
+	const KEY_DOWN = 40;
+
+	$(document).ready(function () {
+		$('.section-nav a').click(function () {
+			$('.section-nav').find(".active").removeClass('active');
+			$(this).parent().addClass('active');
+		});
+
+		$(".tabs-left").tabs({
+			activate: function (event, ui) {
+				if (ui.newTab[0].id === "interpreter-settings-tab") {
+					createWaypoints(15);
+				} else if (ui.newTab[0].id === "endpoint-settings-tab") {
+					createWaypoints(25);
+				} else {
+					createWaypoints(50);
+				}
+			}
+		});
+
+		$(".tabs-left").keydown(function (event) {
+			const activeTab = $('.ui-state-active');
+			let targetTab = null;
+
+      if (event.keyCode === KEY_UP) {
+				targetTab = activeTab.prev('.user-tab');
+				if (targetTab.length === 0)
+					targetTab = $('.user-tab').last();
+
+				updateSelectTab(activeTab, targetTab);
+
+			} else if (event.keyCode === KEY_DOWN) {
+				targetTab = activeTab.next('.user-tab');
+				if (targetTab.length === 0)
+					targetTab = $('.user-tab').first();
+
+				updateSelectTab(activeTab, targetTab);
+      }
+
+    });
+
+		// Creating Waypoints for visible tab: user-settings
+		createWaypoints(45);
+
+		// Removing jQuery tab classes
+		removeUIClasses();
+	});
+
+	function createWaypoints(offset_variant) {
+		// Find a more efficient way to this without sending the offset_variant
+		// Without the correct parent and if offsets are the same the Waypoints all point to the same point, triggering only the first one.
+		$(".settings-pane-body").each(function () {
+			let parent = this;
+			let group_name = $(parent).data('navigation-id');
+			let offset_number = 0;
+
+			$(this).find('.section-nav-header').each(function () {
+				let offset_value = offset_number + '%';
+
+				$(this).waypoint({
+					handler: function (direction) {
+						let selectedElement = $('#' + $(parent).data('navigation-id'));
+						selectedElement.find('li').removeClass('active');
+						selectedElement.find("li[data-target-id='" + this.element.id + "']").addClass('active');
+					},
+					context: $(parent),
+					offset: offset_value,
+					group: group_name
+				});
+
+				offset_number = offset_number + offset_variant;
+			});
+		});
+	}
+
+	function removeUIClasses() {
+		let classes = "ui-tabs ui-corner-all ui-widget ui-widget-content ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-tabs-panel ui-corner-bottom ui-tabs-tab ui-corner-top ui-state-default ui-tab";
+		$('.tabs-left, .tabs-left *').removeClass(classes);
+	}
+
+  function updateSelectTab(prev, curr) {
+		prev.removeClass('ui-state-active ui-tabs-active');
+		prev.find('a').removeClass('active');
+
+		curr.addClass('ui-state-active ui-tabs-active');
+		curr.find('a').addClass('active');
+  }
+</script>
+</div>
+      </main>
+
+      <footer role="contentinfo">
+        
+<div id="theme-footer" class="footer">
+	<div class="logo text-center d-none">
+		<a class="clickable" href="https://globohq.com/" data-test-id="footer-logo-link"></a>
+	</div>
+  <div class="float-right">
+    Portal v2.2.2026.10.21.31f542548740d25e1b40c30d8c981a115d58430c
+  </div>
+  <div>
+    <strong>Copyright</strong> GLOBO &copy; 2013-2026
+  </div>
+</div>
+
+      </footer>
+    </div>
+
+  </div>
+
+
+	<div id="modals-placeholder">
+	</div>
+
+	<script nonce="QMETG+1AnOqyMfzg/tk21Q==">
+//<![CDATA[
+
+	window.onLoaded(function () {
+
+
+	}, true);
+
+//]]>
+</script>
+	
+
+
+	
+
+</body>
+</html>
+
