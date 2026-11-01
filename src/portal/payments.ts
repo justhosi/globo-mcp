@@ -40,6 +40,7 @@ import {
   daysInMonth,
   formatDay,
   isRecord,
+  parsePortalDate,
   round2,
   type DayParts,
 } from "./calls.js";
@@ -549,39 +550,111 @@ export function totalPayments(calls: Payment[]): PaymentTotals {
   };
 }
 
+/** Availability of one payout source as resolved by the tool (`note` carries the failure reason). */
+export interface SourceAvailability {
+  available: boolean;
+  note?: string;
+}
+
+/** One source's block in the tool response. */
+export interface SourceStatus extends SourceAvailability {
+  count: number;
+}
+
+/** Fixed note: both sources are always checked; the two lists cover different records. */
+const COMBINED_NOTE =
+  "Checked both the Tipalti payout history and the portal payroll table. " +
+  "Portal rows are per-method period summaries while Tipalti rows are individual payouts — " +
+  "do not add them together. Totals cover the Tipalti rows only. " +
+  "Tipalti dates are calendar dates as displayed; they carry no timezone.";
+
 /** Paged list response for `globo_payments`. */
 export interface PaymentList {
   total: number;
   returned: number;
   offset: number;
-  /** Payout source: always Tipalti (the portal page is empty for these accounts). */
-  source: "tipalti";
   /**
    * Always null, deliberately: Tipalti dates are displayed calendar dates
    * with no timezone, so no honest value exists. See `note`.
    */
   timezone: null;
   note: string;
+  sources: { portal: SourceStatus; tipalti: SourceStatus };
+  /** Totals over the filtered Tipalti rows only (never the portal summaries). */
   totals: PaymentTotals;
   payments: Payment[];
+  /** Portal payroll rows: range-filtered, always complete, never paged. */
+  portalPayments: PortalPayment[];
 }
 
-/** Filter, order newest-first, then page. Page bounds are validated by the caller. */
+/** One-line reason from a settled rejection (fixed tool strings; never secrets). */
+function rejectionReason(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+/**
+ * Split settled source fetches into rows plus availability. Throws only when
+ * both sources failed, so one source's failure never hides the other's data.
+ */
+export function settlePaymentSources(
+  tipalti: PromiseSettledResult<DatedPayment[]>,
+  portal: PromiseSettledResult<DatedPortalPayment[]>,
+): {
+  tipaltiRows: DatedPayment[];
+  portalRows: DatedPortalPayment[];
+  availability: { tipalti: SourceAvailability; portal: SourceAvailability };
+} {
+  if (tipalti.status === "rejected" && portal.status === "rejected") {
+    throw new Error(
+      `Could not load payments from either source (portal: ${rejectionReason(portal.reason)}; ` +
+        `tipalti: ${rejectionReason(tipalti.reason)}).`,
+    );
+  }
+  return {
+    tipaltiRows: tipalti.status === "fulfilled" ? tipalti.value : [],
+    portalRows: portal.status === "fulfilled" ? portal.value : [],
+    availability: {
+      tipalti:
+        tipalti.status === "fulfilled"
+          ? { available: true }
+          : { available: false, note: rejectionReason(tipalti.reason) },
+      portal:
+        portal.status === "fulfilled"
+          ? { available: true }
+          : { available: false, note: rejectionReason(portal.reason) },
+    },
+  };
+}
+
+/**
+ * Filter, order newest-first, then page the Tipalti rows; range-filter the
+ * portal rows (always complete). Page bounds are validated by the caller.
+ * Portal rows default to empty (Tipalti-only listings, as in unit tests).
+ */
 export function listPayments(
   calls: DatedPayment[],
   filter: PaymentFilter,
   limit: number,
   offset: number,
+  portal: DatedPortalPayment[] = [],
+  availability: { tipalti: SourceAvailability; portal: SourceAvailability } = {
+    tipalti: { available: true },
+    portal: { available: true },
+  },
 ): PaymentList {
   const filtered = calls.filter((call) => matchesPayment(call, filter)).sort(compareNewestFirst);
   const page = filtered.slice(offset, offset + limit);
+  const portalCalls = listPortalPayments(portal, { start: filter.start, end: filter.end });
   return {
     total: filtered.length,
     returned: page.length,
     offset,
-    source: "tipalti",
     timezone: null,
-    note: "Payment dates are calendar dates as Tipalti displays them; they carry no timezone.",
+    note: COMBINED_NOTE,
+    sources: {
+      portal: { ...availability.portal, count: portalCalls.length },
+      tipalti: { ...availability.tipalti, count: filtered.length },
+    },
     totals: totalPayments(filtered),
     payments: page.map((call) => ({
       date: call.date,
@@ -594,5 +667,301 @@ export function listPayments(
       payer: call.payer,
       reportAvailable: call.reportAvailable,
     })),
+    portalPayments: portalCalls,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Portal payroll table (`/interpreter/payments_index`)
+// ---------------------------------------------------------------------------
+// Server-rendered single table inside `#payroll-vouchers-summary-content`
+// (pagy pagination, no JSON twin — HTML scraping is the only path, as with
+// `/scheduled_calls`). Each row is a per-method period summary, not an
+// individual payout: never add these to the Tipalti rows. Detail links
+// (`/interpreter/payment_index/<id>`) are stored, never fetched — those ids
+// are per-payment records and guessing them would be a privacy violation.
+
+const PORTAL_PAYMENTS_PATH = "/interpreter/payments_index";
+/** Hard cap on pagy follows: a runaway `next` chain must not loop forever. */
+const MAX_PORTAL_PAGES = 20;
+/** Cache key for the portal rows (all pages concatenated). */
+const PORTAL_PAYMENTS_CACHE_KEY = "portal:payments-index";
+
+/** One portal payroll-voucher row for `globo_payments` output. */
+export interface PortalPayment {
+  method: string | null;
+  /** Dates cell verbatim. */
+  datesRaw: string;
+  /** ISO period start/end; both null when the cell does not parse. */
+  start: string | null;
+  end: string | null;
+  amount: number | null;
+  /** ISO code when stated (`USD`); null for `$`/bare numbers (never guessed). */
+  currency: string | null;
+  /** Raw Total Amount cell (null when missing/empty). */
+  amountRaw: string | null;
+  /** Numeric id from the details href, when present. */
+  paymentId: number | null;
+  /**
+   * Details href (`/interpreter/payment_index/<id>`) when present. Stored
+   * only — never fetched.
+   */
+  detailsUrl: string | null;
+}
+
+/** Parsed portal row plus period endpoints (null when unparseable). */
+export interface DatedPortalPayment extends PortalPayment {
+  startParts: DayParts | null;
+  endParts: DayParts | null;
+}
+
+/** Collapse whitespace, decode a few entities, and trim. */
+function cleanPortal(raw: string): string {
+  return raw
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** Strip any nested tags, then clean. */
+function portalTextOf(rawHtml: string): string {
+  return cleanPortal(rawHtml.replace(/<[^>]*>/g, " "));
+}
+
+/** Inner HTML of each `<td>` cell of a row, in order. */
+function portalCellsOf(rowHtml: string): string[] {
+  const cells: string[] = [];
+  const re = /<td[^>]*>([\s\S]*?)<\/td>/gi;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(rowHtml)) !== null) {
+    cells.push(match[1] ?? "");
+  }
+  return cells;
+}
+
+/** Text cell: cleaned text, or null when empty. */
+function portalTextCell(cell: string | undefined): string | null {
+  if (cell === undefined) return null;
+  const text = portalTextOf(cell);
+  return text === "" ? null : text;
+}
+
+/**
+ * Parse a Dates cell: either a single `MM/DD/YYYY` date (start and end are
+ * the same day) or a `MM/DD/YYYY - MM/DD/YYYY` range. Both endpoints are
+ * null unless the whole cell parses — a half-known period would mislead the
+ * overlap filter below.
+ */
+function parsePortalPeriod(text: string): { start: DayParts | null; end: DayParts | null } {
+  const trimmed = text.trim();
+  if (trimmed === "") return { start: null, end: null };
+  const parts = trimmed.split(/\s*-\s*/);
+  if (parts.length === 1) {
+    const single = parsePortalDate(parts[0]);
+    return single ? { start: single, end: single } : { start: null, end: null };
+  }
+  if (parts.length === 2) {
+    const start = parsePortalDate(parts[0]);
+    const end = parsePortalDate(parts[1]);
+    return start && end ? { start, end } : { start: null, end: null };
+  }
+  return { start: null, end: null };
+}
+
+/**
+ * Parse a Total Amount cell (`$1,234.56`, `USD 1,234.56`, or a plain
+ * number). A bare `$` or missing code yields an amount with null currency —
+ * the code is never guessed. `N/A`/empty/unparseable → null (never throws).
+ */
+export function parsePortalAmount(
+  value: unknown,
+): { currency: string | null; amount: number } | null {
+  if (typeof value !== "string") return null;
+  const text = value.trim();
+  if (text === "" || /^n\/a$/i.test(text)) return null;
+  const match = /^(?:([A-Za-z]{3})\s+)?\$?\s*(-?[0-9,]*[0-9](?:\.[0-9]+)?)$/.exec(text);
+  const digits = match?.[2];
+  if (match === null || digits === undefined) return null;
+  const amount = Number(digits.replace(/,/g, ""));
+  if (!Number.isFinite(amount)) return null;
+  const code = match[1];
+  return { currency: code === undefined ? null : code.toUpperCase(), amount };
+}
+
+/** Details link when the cell holds one, else null (stored, never fetched). */
+function portalDetailsOf(cell: string | undefined): { url: string; id: number } | null {
+  if (cell === undefined) return null;
+  const href = /<a[^>]*href="([^"]*)"[^>]*>/i.exec(cell)?.[1]?.trim() ?? "";
+  const id = /^\/interpreter\/payment_index\/(\d+)$/.exec(href)?.[1];
+  if (id === undefined) return null;
+  return { url: href, id: Number(id) };
+}
+
+/** Parse one portal table row; null (plus a warning) only when cells are missing. */
+function parsePortalRow(cells: string[]): DatedPortalPayment | null {
+  if (cells.length < 3) {
+    warn("skipping portal payment row with missing cells");
+    return null;
+  }
+  const datesRaw = portalTextOf(cells[1] ?? "");
+  const period = parsePortalPeriod(datesRaw);
+  if (datesRaw !== "" && (period.start === null || period.end === null)) {
+    warn("portal payment row has an unparseable dates cell; keeping it dateless");
+  }
+  const amountRaw = portalTextCell(cells[2]);
+  const parsedAmount = amountRaw === null ? null : parsePortalAmount(amountRaw);
+  if (amountRaw !== null && parsedAmount === null) {
+    warn("portal payment row has an unparseable amount; amount and currency will be null");
+  }
+  const details = portalDetailsOf(cells[3]);
+  return {
+    method: portalTextCell(cells[0]),
+    datesRaw,
+    start: period.start ? formatDay(period.start) : null,
+    end: period.end ? formatDay(period.end) : null,
+    amount: parsedAmount?.amount ?? null,
+    currency: parsedAmount?.currency ?? null,
+    amountRaw,
+    paymentId: details?.id ?? null,
+    detailsUrl: details?.url ?? null,
+    startParts: period.start,
+    endParts: period.end,
+  };
+}
+
+/**
+ * Parse the portal payroll-voucher page. Throws a friendly error when the
+ * section table is missing (the page changed); an empty `<tbody>` yields
+ * zero rows.
+ */
+export function parsePortalPayments(html: string): DatedPortalPayment[] {
+  const section = /<div[^>]*\bid\s*=\s*["']?payroll-vouchers-summary-content["']?[^>]*>/i.exec(
+    html,
+  );
+  if (!section) {
+    throw new Error("The portal payments table is missing. The portal may have changed.");
+  }
+  const table = /<table[^>]*>([\s\S]*?)<\/table>/i.exec(html.slice(section.index));
+  if (!table?.[1]) {
+    throw new Error("The portal payments table is missing. The portal may have changed.");
+  }
+  // Header rows hold `<th>` cells, so only `<tr>` rows with `<td>` cells are
+  // data; extra cells are ignored positionally (method/dates/amount).
+  const rows: DatedPortalPayment[] = [];
+  const rowRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+  let match: RegExpExecArray | null;
+  while ((match = rowRe.exec(table[1])) !== null) {
+    const rowHtml = match[1] ?? "";
+    if (!/<td[\s>]/.test(rowHtml)) continue;
+    const parsed = parsePortalRow(portalCellsOf(rowHtml));
+    if (parsed) rows.push(parsed);
+  }
+  return rows;
+}
+
+/**
+ * Next-page href from the pagy nav, or null when `next` is disabled, empty,
+ * or off-portal (fail closed with a warning — a foreign target is never
+ * followed).
+ */
+function nextPageHref(html: string, baseUrl: string): string | null {
+  const item = /<li[^>]*class="([^"]*\bnext\b[^"]*)"[^>]*>([\s\S]*?)<\/li>/i.exec(html);
+  if (!item) return null;
+  if (/\bdisabled\b/i.test(item[1] ?? "")) return null;
+  const href = /<a[^>]*href="([^"]*)"[^>]*>/i.exec(item[2] ?? "")?.[1]?.trim();
+  if (!href || href === "#") return null;
+  try {
+    const target = new URL(href, baseUrl);
+    if (target.origin !== new URL(baseUrl).origin) {
+      warn(`ignoring off-portal payments next link to ${JSON.stringify(target.origin)}`);
+      return null;
+    }
+    return `${target.pathname}${target.search}`;
+  } catch {
+    warn("ignoring unparseable payments next link");
+    return null;
+  }
+}
+
+/** Fetch (and cache) all portal payroll-voucher rows, following pagy `next` up to a cap. */
+export async function fetchPortalPayments(
+  auth: PortalAuth,
+  cache: TtlCache,
+): Promise<DatedPortalPayment[]> {
+  const cached = cache.get<DatedPortalPayment[]>(PORTAL_PAYMENTS_CACHE_KEY);
+  if (cached) return cached;
+  const rows: DatedPortalPayment[] = [];
+  let path: string | null = PORTAL_PAYMENTS_PATH;
+  for (let page = 0; page < MAX_PORTAL_PAGES && path !== null; page++) {
+    const result = await auth.fetchWithAuth(path);
+    if (result.status !== 200) {
+      throw new Error(
+        `Could not load the portal payments page (HTTP ${result.status}). The portal may be down.`,
+      );
+    }
+    rows.push(...parsePortalPayments(result.text));
+    path = nextPageHref(result.text, auth.client.baseUrl);
+  }
+  if (path !== null) {
+    warn(
+      `portal payments list exceeds ${MAX_PORTAL_PAGES} pages; showing the first ${MAX_PORTAL_PAGES}`,
+    );
+  }
+  cache.set(PORTAL_PAYMENTS_CACHE_KEY, rows);
+  return rows;
+}
+
+/** Range-only filter for portal rows (portal rows are otherwise unfiltered). */
+export interface PortalPaymentRange {
+  start?: DayParts;
+  end?: DayParts;
+}
+
+/**
+ * True when a portal row overlaps the requested range. Unparseable dates are
+ * excluded from a range filter, as elsewhere.
+ */
+export function matchesPortalPayment(
+  call: DatedPortalPayment,
+  filter: PortalPaymentRange,
+): boolean {
+  if (filter.start === undefined && filter.end === undefined) return true;
+  if (call.startParts === null || call.endParts === null) return false;
+  // Overlap with possibly open ends: rowStart <= filterEnd && rowEnd >= filterStart.
+  if (filter.end !== undefined && dayKey(call.startParts) > dayKey(filter.end)) return false;
+  if (filter.start !== undefined && dayKey(call.endParts) < dayKey(filter.start)) return false;
+  return true;
+}
+
+/** Newest first by period start; dateless rows last; ties keep page order (stable). */
+function comparePortalNewestFirst(a: DatedPortalPayment, b: DatedPortalPayment): number {
+  if (a.startParts === null && b.startParts === null) return 0;
+  if (a.startParts === null) return 1;
+  if (b.startParts === null) return -1;
+  return dayKey(b.startParts) - dayKey(a.startParts);
+}
+
+/** Range-filter (overlap) and order newest-first; portal rows are never paged. */
+export function listPortalPayments(
+  calls: DatedPortalPayment[],
+  filter: PortalPaymentRange,
+): PortalPayment[] {
+  return calls
+    .filter((call) => matchesPortalPayment(call, filter))
+    .sort(comparePortalNewestFirst)
+    .map((call) => ({
+      method: call.method,
+      datesRaw: call.datesRaw,
+      start: call.start,
+      end: call.end,
+      amount: call.amount,
+      currency: call.currency,
+      amountRaw: call.amountRaw,
+      paymentId: call.paymentId,
+      detailsUrl: call.detailsUrl,
+    }));
 }

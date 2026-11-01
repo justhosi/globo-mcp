@@ -2,16 +2,24 @@ import { readFileSync } from "node:fs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PortalAuth } from "../src/auth.js";
 import { HttpClient } from "../src/http.js";
+import type { FetchResult } from "../src/http.js";
 import { TtlCache } from "../src/portal/cache.js";
 import {
   extractPaymentsPanelUrl,
   fetchPayments,
+  fetchPortalPayments,
   listPayments,
+  listPortalPayments,
+  matchesPortalPayment,
   parsePaymentHistory,
+  parsePortalAmount,
+  parsePortalPayments,
   parseTipaltiAmount,
   parseTipaltiDate,
+  settlePaymentSources,
   totalPayments,
   type DatedPayment,
+  type DatedPortalPayment,
 } from "../src/portal/payments.js";
 
 const PORTAL_BASE = "https://globohq.com";
@@ -150,14 +158,18 @@ describe("parsePaymentHistory", () => {
 });
 
 describe("listPayments", () => {
-  it("orders newest first (stable ties, dateless last) with source tipalti", () => {
+  it("orders newest first (stable ties, dateless last) with both sources", () => {
     const list = listPayments(history(), {}, 100, 0);
     expect(list.total).toBe(6);
     expect(list.returned).toBe(6);
     expect(list.offset).toBe(0);
-    expect(list.source).toBe("tipalti");
     expect(list.timezone).toBeNull();
-    expect(list.note).toMatch(/no timezone/);
+    expect(list.note).toMatch(/do not add them together/);
+    expect(list.sources).toEqual({
+      portal: { available: true, count: 0 },
+      tipalti: { available: true, count: 6 },
+    });
+    expect(list.portalPayments).toEqual([]);
     expect(list.payments.map((payment) => payment.paymentId)).toEqual([
       910003, 910001, 910002, 910004, 910005, 910006,
     ]);
@@ -510,5 +522,312 @@ describe("fetchPayments chain", () => {
     await expect(fetchPayments(auth, new TtlCache(), 50)).rejects.toThrow(
       /Tipalti did not respond within 50ms while loading the payments panel/,
     );
+  });
+});
+
+describe("parsePortalAmount", () => {
+  it("parses code, dollar, and plain-number forms", () => {
+    expect(parsePortalAmount("$1,234.56")).toEqual({ currency: null, amount: 1234.56 });
+    expect(parsePortalAmount("USD 500.00")).toEqual({ currency: "USD", amount: 500 });
+    expect(parsePortalAmount("1,234")).toEqual({ currency: null, amount: 1234 });
+  });
+
+  it("returns null for N/A, empty, and unparseable text", () => {
+    expect(parsePortalAmount("N/A")).toBeNull();
+    expect(parsePortalAmount("n/a")).toBeNull();
+    expect(parsePortalAmount("")).toBeNull();
+    expect(parsePortalAmount("garbage")).toBeNull();
+    expect(parsePortalAmount("USD ,")).toBeNull();
+    expect(parsePortalAmount(null)).toBeNull();
+    expect(parsePortalAmount(42)).toBeNull();
+  });
+});
+
+describe("parsePortalPayments", () => {
+  function populated(): DatedPortalPayment[] {
+    return parsePortalPayments(fixture("payments-index-populated.html"));
+  }
+
+  it("parses the populated fixture rows", () => {
+    const rows = populated();
+    expect(rows).toHaveLength(3);
+    expect(rows[0]).toMatchObject({
+      method: "Direct Deposit",
+      datesRaw: "09/01/2026 - 09/30/2026",
+      start: "2026-09-01",
+      end: "2026-09-30",
+      amount: 1234.56,
+      currency: null,
+      amountRaw: "$1,234.56",
+      paymentId: 4242,
+      detailsUrl: "/interpreter/payment_index/4242",
+    });
+    expect(rows[1]).toMatchObject({
+      method: "Check",
+      start: "2026-10-15",
+      end: "2026-10-15",
+      amount: 500,
+      currency: "USD",
+      paymentId: 4243,
+    });
+    // N/A dates and an empty amount survive without throwing.
+    expect(rows[2]).toMatchObject({
+      datesRaw: "N/A",
+      start: null,
+      end: null,
+      amount: null,
+      currency: null,
+      amountRaw: null,
+      paymentId: null,
+      detailsUrl: null,
+    });
+  });
+
+  it("returns zero rows for the empty live shape", () => {
+    expect(parsePortalPayments(fixture("payments-index.html"))).toEqual([]);
+  });
+
+  it("throws a friendly error when the section table is missing", () => {
+    expect(() => parsePortalPayments("<html><body>redesigned</body></html>")).toThrow(
+      /payments table is missing/,
+    );
+  });
+
+  it("skips rows with too few cells without failing the page", () => {
+    const rows = parsePortalPayments(
+      `<div id="payroll-vouchers-summary-content"><table><tbody>` +
+        `<tr><td>Direct Deposit</td><td>09/01/2026</td><td>$10.00</td><td></td></tr>` +
+        `<tr><td>only</td><td>two</td></tr>` +
+        `</tbody></table></div>`,
+    );
+    expect(rows.map((row) => row.amount)).toEqual([10]);
+  });
+});
+
+describe("listPortalPayments", () => {
+  function populated(): DatedPortalPayment[] {
+    return parsePortalPayments(fixture("payments-index-populated.html"));
+  }
+
+  it("orders newest first with dateless rows last, exposing every field", () => {
+    const list = listPortalPayments(populated(), {});
+    expect(list.map((row) => row.paymentId)).toEqual([4243, 4242, null]);
+    expect(Object.keys(list[0] ?? {})).toEqual([
+      "method",
+      "datesRaw",
+      "start",
+      "end",
+      "amount",
+      "currency",
+      "amountRaw",
+      "paymentId",
+      "detailsUrl",
+    ]);
+  });
+
+  it("range-filters by overlap, excluding dateless rows", () => {
+    const rows = populated();
+    // September only: the September range row (the October row ends after it).
+    expect(
+      listPortalPayments(rows, {
+        start: { y: 2026, m: 9, d: 1 },
+        end: { y: 2026, m: 9, d: 30 },
+      }).map((row) => row.paymentId),
+    ).toEqual([4242]);
+    // Open-ended from October: the October row only.
+    expect(
+      listPortalPayments(rows, { start: { y: 2026, m: 10, d: 1 } }).map((row) => row.paymentId),
+    ).toEqual([4243]);
+    // Abutting the range edge still overlaps (inclusive both ends).
+    expect(
+      listPortalPayments(rows, {
+        start: { y: 2026, m: 9, d: 30 },
+        end: { y: 2026, m: 9, d: 30 },
+      }).map((row) => row.paymentId),
+    ).toEqual([4242]);
+    // Dateless rows never satisfy a range.
+    expect(listPortalPayments(rows, { start: { y: 2020, m: 1, d: 1 } })).toHaveLength(2);
+    expect(matchesPortalPayment(rows[2], { start: { y: 2026, m: 1, d: 1 } })).toBe(false);
+    expect(matchesPortalPayment(rows[2], {})).toBe(true);
+  });
+});
+
+describe("fetchPortalPayments", () => {
+  function portalStub(
+    pages: Map<string, string>,
+    statuses?: Map<string, number>,
+  ): { auth: PortalAuth; requested: string[] } {
+    const http = new HttpClient(PORTAL_BASE);
+    const requested: string[] = [];
+    http.get = async (path: string): Promise<FetchResult> => {
+      requested.push(path);
+      const body = pages.get(path);
+      if (body === undefined) throw new Error(`unexpected portal GET to ${path}`);
+      return {
+        status: statuses?.get(path) ?? 200,
+        headers: new Headers({ "content-type": "text/html" }),
+        text: body,
+        url: `${PORTAL_BASE}${path}`,
+      };
+    };
+    const auth = new PortalAuth(
+      {
+        email: "a@b.c",
+        password: undefined,
+        sessionCookie: "cookie",
+        baseUrl: PORTAL_BASE,
+        timezone: undefined,
+      },
+      http,
+    );
+    return { auth, requested };
+  }
+
+  function portalPage(rows: string, next: string): string {
+    return (
+      `<div id="payroll-vouchers-summary-content"><table><thead><tr>` +
+      `<th>Payment Method</th><th>Dates</th><th>Total Amount</th><th></th>` +
+      `</tr></thead><tbody>${rows}</tbody></table>` +
+      `<nav><ul class="pagination">${next}</ul></nav></div>`
+    );
+  }
+
+  function portalRow(method: string, dates: string, amount: string, id?: number): string {
+    const link = id === undefined ? "" : `<a href="/interpreter/payment_index/${id}">Details</a>`;
+    return `<tr><td>${method}</td><td>${dates}</td><td>${amount}</td><td>${link}</td></tr>`;
+  }
+
+  const nextOff = `<li class="page-item next disabled"><a href="#">Next</a></li>`;
+
+  it("reads one page and caches it", async () => {
+    const { auth, requested } = portalStub(
+      new Map([["/interpreter/payments_index", fixture("payments-index-populated.html")]]),
+    );
+    const cache = new TtlCache();
+    const first = await fetchPortalPayments(auth, cache);
+    expect(first).toHaveLength(3);
+    expect(await fetchPortalPayments(auth, cache)).toBe(first);
+    expect(requested).toEqual(["/interpreter/payments_index"]);
+  });
+
+  it("follows an enabled next link but never requests detail URLs", async () => {
+    const page1 = portalPage(
+      portalRow("Direct Deposit", "09/01/2026 - 09/30/2026", "$10.00", 4242),
+      `<li class="page-item next"><a href="/interpreter/payments_index?page=2">Next</a></li>`,
+    );
+    const page2 = portalPage(portalRow("Check", "10/15/2026", "$20.00", 4243), nextOff);
+    const { auth, requested } = portalStub(
+      new Map([
+        ["/interpreter/payments_index", page1],
+        ["/interpreter/payments_index?page=2", page2],
+      ]),
+    );
+    const rows = await fetchPortalPayments(auth, new TtlCache());
+    expect(rows.map((row) => row.paymentId)).toEqual([4242, 4243]);
+    expect(requested).toEqual([
+      "/interpreter/payments_index",
+      "/interpreter/payments_index?page=2",
+    ]);
+    expect(requested.some((path) => /\/payment_index\//.test(path))).toBe(false);
+  });
+
+  it("stops after the 20-page cap", async () => {
+    const { auth, requested } = portalStub(new Map());
+    // Every page links onward: without a cap this would never terminate.
+    httpGetAnyPage(auth, requested);
+    const rows = await fetchPortalPayments(auth, new TtlCache());
+    expect(requested).toHaveLength(20);
+    expect(rows).toHaveLength(20);
+  });
+
+  function httpGetAnyPage(auth: PortalAuth, requested: string[]): void {
+    const http = auth.client;
+    let n = 0;
+    http.get = async (path: string): Promise<FetchResult> => {
+      requested.push(path);
+      n += 1;
+      const body = portalPage(
+        portalRow(`Method${n}`, "09/01/2026", "$1.00"),
+        `<li class="page-item next"><a href="/interpreter/payments_index?page=${n + 1}">Next</a></li>`,
+      );
+      return {
+        status: 200,
+        headers: new Headers({ "content-type": "text/html" }),
+        text: body,
+        url: `${PORTAL_BASE}${path}`,
+      };
+    };
+  }
+
+  it("reports a non-200 page with a friendly error", async () => {
+    const { auth } = portalStub(
+      new Map([["/interpreter/payments_index", "down"]]),
+      new Map([["/interpreter/payments_index", 500]]),
+    );
+    await expect(fetchPortalPayments(auth, new TtlCache())).rejects.toThrow(
+      /Could not load the portal payments page \(HTTP 500\)/,
+    );
+  });
+});
+
+describe("settlePaymentSources", () => {
+  it("throws only when both sources fail, naming both reasons", () => {
+    const tipalti: PromiseSettledResult<DatedPayment[]> = {
+      status: "rejected",
+      reason: new Error("tipalti boom"),
+    };
+    const portal: PromiseSettledResult<DatedPortalPayment[]> = {
+      status: "rejected",
+      reason: "portal boom",
+    };
+    expect(() => settlePaymentSources(tipalti, portal)).toThrow(
+      /either source \(portal: portal boom; tipalti: tipalti boom\)/,
+    );
+  });
+
+  it("lets one failure through with rows and reasons from the other side", () => {
+    const rows = history();
+    const tipaltiOk = settlePaymentSources(
+      { status: "fulfilled", value: rows },
+      { status: "rejected", reason: new Error("portal down") },
+    );
+    expect(tipaltiOk.tipaltiRows).toBe(rows);
+    expect(tipaltiOk.portalRows).toEqual([]);
+    expect(tipaltiOk.availability).toEqual({
+      tipalti: { available: true },
+      portal: { available: false, note: "portal down" },
+    });
+
+    const portalOk = settlePaymentSources(
+      { status: "rejected", reason: "tipalti down" },
+      { status: "fulfilled", value: [] },
+    );
+    expect(portalOk.tipaltiRows).toEqual([]);
+    expect(portalOk.availability.tipalti).toEqual({ available: false, note: "tipalti down" });
+    expect(portalOk.availability.portal).toEqual({ available: true });
+  });
+
+  it("combines a failed Tipalti side with portal rows, Tipalti-only totals", () => {
+    const portal = parsePortalPayments(fixture("payments-index-populated.html"));
+    const settled = settlePaymentSources(
+      {
+        status: "rejected",
+        reason: new Error(
+          "Could not read the payments panel on the profile page. The portal may have changed.",
+        ),
+      },
+      { status: "fulfilled", value: portal },
+    );
+    const list = listPayments([], {}, 100, 0, settled.portalRows, settled.availability);
+    expect(list.total).toBe(0);
+    expect(list.payments).toEqual([]);
+    expect(list.sources.tipalti).toEqual({
+      available: false,
+      count: 0,
+      note: "Could not read the payments panel on the profile page. The portal may have changed.",
+    });
+    expect(list.sources.portal).toEqual({ available: true, count: 3 });
+    expect(list.portalPayments.map((row) => row.paymentId)).toEqual([4243, 4242, null]);
+    expect(list.totals).toEqual({ byCurrency: [], byStatus: [] });
   });
 });

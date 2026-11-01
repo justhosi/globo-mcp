@@ -25,7 +25,12 @@ import { TtlCache } from "./portal/cache.js";
 import { fetchMonthlyMinutes } from "./portal/monthly.js";
 import { fetchScheduledCalls, listScheduledCalls } from "./portal/scheduled.js";
 import { fetchAssignments, listAssignments } from "./portal/assignments.js";
-import { fetchPayments, listPayments } from "./portal/payments.js";
+import {
+  fetchPayments,
+  fetchPortalPayments,
+  listPayments,
+  settlePaymentSources,
+} from "./portal/payments.js";
 import { getAccountTimezone } from "./portal/timezone.js";
 import { getProfile } from "./portal/profile.js";
 import { checkPaging } from "./paging.js";
@@ -326,7 +331,7 @@ async function main(): Promise<void> {
     {
       title: "Payments",
       description:
-        "Show payout history from Tipalti, the portal's payout provider (the portal's own payments page is empty for Tipalti accounts): payment date, amount and currency, status, method, and payer, as Tipalti displays them. Filter by date range, status or currency (case-insensitive exact match); results are paginated with per-currency and per-status totals. For worked-call history use globo_list_calls.",
+        "Show payout history from both sources: Tipalti individual payouts (date, amount, currency, status, method, payer) and the portal payroll table (per-method period summaries with method, dates, and amount). Filter Tipalti rows by date range, status or currency (case-insensitive exact match); results are paginated with per-currency and per-status totals over the Tipalti rows (each currency entry also carries the Paid-only paidAmount/paidCount). Portal rows are always complete and only date-range filtered — the two lists cover different records, do not add them together. For worked-call history use globo_list_calls.",
       inputSchema: z.object({
         ...dateRangeShape,
         status: z
@@ -348,9 +353,15 @@ async function main(): Promise<void> {
       runTool(async () => {
         const { startParts, endParts } = parseRange(start, end);
         checkPaging(limit, offset);
-        const rows = await fetchPayments(auth, cache);
+        // Each source resolves independently: one failure never hides the
+        // other's data. Only a double failure is an error (thrown below).
+        const [tipalti, portal] = await Promise.allSettled([
+          fetchPayments(auth, cache),
+          fetchPortalPayments(auth, cache),
+        ]);
+        const settled = settlePaymentSources(tipalti, portal);
         return listPayments(
-          rows,
+          settled.tipaltiRows,
           {
             start: startParts,
             end: endParts,
@@ -359,6 +370,8 @@ async function main(): Promise<void> {
           },
           limit,
           offset,
+          settled.portalRows,
+          settled.availability,
         );
       }),
   );
