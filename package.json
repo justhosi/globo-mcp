@@ -1,11 +1,11 @@
 {
   "name": "globo-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Unofficial MCP server for the GLOBO Portal (globohq.com) interpreter work portal",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/justhosi/globo-mcp.git"
+    "url": "git+https://github.com/justhosi/globo-mcp.git"
   },
   "homepage": "https://github.com/justhosi/globo-mcp#readme",
   "bugs": {
@@ -33,7 +33,6 @@
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
-    "prepack": "npm run build",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
     "lint": "eslint .",

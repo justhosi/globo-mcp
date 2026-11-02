@@ -42,18 +42,16 @@ Example requests once connected:
 
 ## Install
 
-The package is not published to npm yet, so the recommended way to run it today is straight from GitHub — no clone, no build step:
+The published package is the easiest way to run it — no clone, no build step:
 
 ```sh
-npx -y github:justhosi/globo-mcp
+npx -y globo-mcp
 ```
-
-npm builds `dist/` from source when it installs the GitHub dependency, so you always run the committed code. Once the package is published, `npx -y globo-mcp` will work too; the GitHub form keeps working either way.
 
 Three ways to get the server:
 
-1. From GitHub (recommended, works today): `npx -y github:justhosi/globo-mcp`
-2. From npm (once published — not available yet): `npx -y globo-mcp`
+1. From npm (recommended): `npx -y globo-mcp`
+2. From GitHub — the latest unreleased code from master (builds from source on first run): `npx -y github:justhosi/globo-mcp`
 3. From a local checkout (for development): clone and build as below, and run `node dist/index.js` — use this when editing the code.
 
 For option 3, clone it once:
@@ -88,7 +86,7 @@ The server reads these environment variables:
 Start the server by hand to check it works:
 
 ```sh
-GLOBO_EMAIL='you@example.com' GLOBO_PASSWORD='your-password' npx -y github:justhosi/globo-mcp
+GLOBO_EMAIL='you@example.com' GLOBO_PASSWORD='your-password' npx -y globo-mcp
 ```
 
 From a local checkout (for development), run the built file instead:
@@ -104,7 +102,7 @@ It prints nothing on success — it waits for JSON-RPC on stdin, and logs only t
 ### Claude Code
 
 ```sh
-claude mcp add globo --scope user --env GLOBO_EMAIL=you@example.com --env GLOBO_PASSWORD=your-password -- npx -y github:justhosi/globo-mcp
+claude mcp add globo --scope user --env GLOBO_EMAIL=you@example.com --env GLOBO_PASSWORD=your-password -- npx -y globo-mcp
 ```
 
 `--scope user` makes it available in every project. To share the setup with a repository instead, commit a `.mcp.json`:
@@ -114,7 +112,7 @@ claude mcp add globo --scope user --env GLOBO_EMAIL=you@example.com --env GLOBO_
   "mcpServers": {
     "globo": {
       "command": "npx",
-      "args": ["-y", "github:justhosi/globo-mcp"],
+      "args": ["-y", "globo-mcp"],
       "env": {
         "GLOBO_EMAIL": "${GLOBO_EMAIL}",
         "GLOBO_PASSWORD": "${GLOBO_PASSWORD}"
@@ -141,7 +139,7 @@ Edit the config file, then restart the app:
   "mcpServers": {
     "globo": {
       "command": "npx",
-      "args": ["-y", "github:justhosi/globo-mcp"],
+      "args": ["-y", "globo-mcp"],
       "env": {
         "GLOBO_EMAIL": "you@example.com",
         "GLOBO_PASSWORD": "your-password"
@@ -158,8 +156,8 @@ Add a block to `~/.codex/config.toml` (or `.codex/config.toml` inside a trusted 
 ```toml
 [mcp_servers.globo]
 command = "npx"
-args = ["-y", "github:justhosi/globo-mcp"]
-# The first run fetches the repo, installs and builds it, which can take a while.
+args = ["-y", "globo-mcp"]
+# From npm the first run only downloads a small package; the GitHub form also builds from source, so keep the generous timeout for that route.
 startup_timeout_sec = 60
 tool_timeout_sec = 120
 
@@ -181,7 +179,7 @@ Add the server to `opencode.jsonc` (project) or `~/.config/opencode/opencode.jso
     "servers": {
       "globo": {
         "type": "local",
-        "command": ["npx", "-y", "github:justhosi/globo-mcp"],
+        "command": ["npx", "-y", "globo-mcp"],
         "environment": {
           "GLOBO_EMAIL": "{env:GLOBO_EMAIL}",
           "GLOBO_PASSWORD": "{env:GLOBO_PASSWORD}",
@@ -195,7 +193,7 @@ Add the server to `opencode.jsonc` (project) or `~/.config/opencode/opencode.jso
 `{env:NAME}` reads the value from your shell environment, so the password never has to sit in the config file. Or add it from the CLI:
 
 ```sh
-opencode mcp add globo --env GLOBO_EMAIL=you@example.com --env GLOBO_PASSWORD=your-password -- npx -y github:justhosi/globo-mcp
+opencode mcp add globo --env GLOBO_EMAIL=you@example.com --env GLOBO_PASSWORD=your-password -- npx -y globo-mcp
 ```
 
 Run `opencode mcp list` to confirm it connected; inside OpenCode, `/mcps` shows the same status.
@@ -211,14 +209,14 @@ Run `opencode mcp list` to confirm it connected; inside OpenCode, `/mcps` shows 
 
 ## Troubleshooting
 
-| Symptom                                           | Cause and fix                                                                                                                                                                                                                                                                     |
-| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Sign-in failed: wrong email or password`         | Check `GLOBO_EMAIL` / `GLOBO_PASSWORD`. No third-party login is involved.                                                                                                                                                                                                         |
-| `Sign-in needs multi-factor authentication (MFA)` | Your account has MFA enabled. Sign in to the portal in a browser, copy the `_globo-portal_session` cookie value and set `GLOBO_SESSION_COOKIE` instead of the password.                                                                                                           |
-| Tools work, then fail after a while               | Sessions expire. The server re-signs in automatically once; if the session came from `GLOBO_SESSION_COOKIE`, it cannot, and you need a fresh cookie.                                                                                                                              |
-| `The portal did not respond within 30s`           | The portal was slow or unreachable. Retry; raise the client's tool timeout if it happens on cold starts.                                                                                                                                                                          |
-| A tool reports the page layout changed            | GLOBO changed its HTML. The parsers are defensive by design, but a redesign needs a code update.                                                                                                                                                                                  |
-| Nothing appears in the client                     | With the `npx` route the first start needs network: it fetches the repo, installs and builds, so allow up to a minute. From a local checkout, check the absolute path to `dist/index.js` and that you ran `npm run build`. Servers receive no stdout chatter — logs go to stderr. |
+| Symptom                                           | Cause and fix                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Sign-in failed: wrong email or password`         | Check `GLOBO_EMAIL` / `GLOBO_PASSWORD`. No third-party login is involved.                                                                                                                                                                                                                                                         |
+| `Sign-in needs multi-factor authentication (MFA)` | Your account has MFA enabled. Sign in to the portal in a browser, copy the `_globo-portal_session` cookie value and set `GLOBO_SESSION_COOKIE` instead of the password.                                                                                                                                                           |
+| Tools work, then fail after a while               | Sessions expire. The server re-signs in automatically once; if the session came from `GLOBO_SESSION_COOKIE`, it cannot, and you need a fresh cookie.                                                                                                                                                                              |
+| `The portal did not respond within 30s`           | The portal was slow or unreachable. Retry; raise the client's tool timeout if it happens on cold starts.                                                                                                                                                                                                                          |
+| A tool reports the page layout changed            | GLOBO changed its HTML. The parsers are defensive by design, but a redesign needs a code update.                                                                                                                                                                                                                                  |
+| Nothing appears in the client                     | With the npm route the first start needs network to download the package; the GitHub route also builds from source on first run, so allow up to a minute for that one. From a local checkout, check the absolute path to `dist/index.js` and that you ran `npm run build`. Servers receive no stdout chatter — logs go to stderr. |
 
 ## Privacy and security
 
@@ -253,14 +251,27 @@ src/portal/         one module per data area
 
 ## Publishing (maintainers)
 
-The package is not published to npm yet. When it is ready:
+The package is published to npm as `globo-mcp`. Publishing requires 2FA. Bump the version, then publish:
 
 ```sh
 npm login
+npm version patch
 npm publish --access public
 ```
 
-The `prepack` script builds `dist/` automatically, so the tarball is always built from source rather than a stale local copy. `npm pack --dry-run` shows what would be published (59 files, including `dist/index.js`, no tests or fixtures). Once published, `npx -y globo-mcp` works; the GitHub form keeps working either way.
+`npm version patch` bumps the version and also creates a git commit and tag. `npm publish` then asks for your 6-digit authenticator code; if you prefer to pass it inline, add `--otp=123456`, where `123456` is a placeholder for that code — note that inline values end up in your shell history.
+
+Alternatively, use a granular access token with "Bypass two-factor authentication" enabled:
+
+```sh
+npm config set //registry.npmjs.org/:_authToken=YOUR_TOKEN_HERE
+npm version patch
+npm publish --access public
+```
+
+`YOUR_TOKEN_HERE` is a placeholder for the token value. This stores a long-lived token in plain text in `~/.npmrc`, so remove it afterwards with `npm config delete //registry.npmjs.org/:_authToken`.
+
+The `prepare` script builds `dist/` automatically, so the tarball is always built from source rather than a stale local copy. `npm pack --dry-run` shows what would be published (59 files, including `dist/index.js`, no tests or fixtures).
 
 ## Disclaimer
 
