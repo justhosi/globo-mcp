@@ -33,6 +33,7 @@ import {
   isTipaltiUrl,
   TIPALT_HOST,
 } from "../http.js";
+import { USER_AGENT } from "../version.js";
 import type { TtlCache } from "./cache.js";
 import {
   datedParts,
@@ -266,7 +267,7 @@ async function fetchPanelHtml(url: string, timeoutMs: number): Promise<string> {
   for (let hop = 0; hop <= MAX_TIPALT_HOPS; hop++) {
     const response = await tipaltiFetch(
       current,
-      { headers: { "User-Agent": "globo-mcp/0.1.0" }, redirect: "manual" },
+      { headers: { "User-Agent": USER_AGENT }, redirect: "manual" },
       "panel",
       timeoutMs,
     );
@@ -315,7 +316,7 @@ async function postPaymentHistory(
         authorizationtoken: token,
         "X-Requested-With": "XMLHttpRequest",
         Accept: "application/json, text/plain, */*",
-        "User-Agent": "globo-mcp/0.1.0",
+        "User-Agent": USER_AGENT,
       },
       body: TIPALT_HISTORY_BODY,
     },

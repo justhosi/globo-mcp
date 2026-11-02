@@ -6,13 +6,13 @@
  * and `globo_whoami`.
  */
 
-import { createRequire } from "node:module";
 import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { PortalAuth } from "./auth.js";
 import { loadConfig } from "./config.js";
 import { HttpClient } from "./http.js";
+import { VERSION } from "./version.js";
 import {
   dayKey,
   fetchCallLog,
@@ -44,9 +44,6 @@ import {
   readResourcePayload,
   readResourcesPayload,
 } from "./portal/resources.js";
-
-const require = createRequire(import.meta.url);
-const pkg = require("../package.json") as unknown as { version: string };
 
 const dateRangeShape = {
   start: z
@@ -94,7 +91,7 @@ async function main(): Promise<void> {
   const config = loadConfig();
   const auth = new PortalAuth(config, new HttpClient(config.baseUrl));
   const cache = new TtlCache();
-  const server = new McpServer({ name: "globo-mcp", version: pkg.version });
+  const server = new McpServer({ name: "globo-mcp", version: VERSION });
 
   server.registerTool(
     "globo_whoami",

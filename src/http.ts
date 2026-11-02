@@ -8,6 +8,8 @@
  * does not need it).
  */
 
+import { USER_AGENT } from "./version.js";
+
 const MAX_REDIRECTS = 10;
 /** Host of the Auth0 tenant the portal delegates sign-in to. */
 export const AUTH_HOST = "auth.globohq.cloud";
@@ -279,7 +281,7 @@ export class HttpClient {
 
     for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
       const headers = new Headers(extraHeaders);
-      headers.set("User-Agent", "globo-mcp/0.1.0");
+      headers.set("User-Agent", USER_AGENT);
       const cookie = this.jar.headerFor(currentUrl);
       if (cookie) setCookieHeader(headers, cookie);
 
@@ -348,7 +350,7 @@ export class HttpClient {
    */
   async requestOnce(url: string, init: RequestInit = {}): Promise<FetchResult> {
     const headers = new Headers(init.headers);
-    headers.set("User-Agent", "globo-mcp/0.1.0");
+    headers.set("User-Agent", USER_AGENT);
     const cookie = this.jar.headerFor(url);
     if (cookie) setCookieHeader(headers, cookie);
 

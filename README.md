@@ -271,7 +271,7 @@ npm publish --access public
 
 `YOUR_TOKEN_HERE` is a placeholder for the token value. This stores a long-lived token in plain text in `~/.npmrc`, so remove it afterwards with `npm config delete //registry.npmjs.org/:_authToken`.
 
-The `prepare` script builds `dist/` automatically, so the tarball is always built from source rather than a stale local copy. `npm pack --dry-run` shows what would be published (59 files, including `dist/index.js`, no tests or fixtures).
+The `prepare` script builds `dist/` automatically, so the tarball is always built from source rather than a stale local copy. `npm pack --dry-run` shows what would be published (63 files, including `dist/index.js`, no tests or fixtures).
 
 ## Disclaimer
 
