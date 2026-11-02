@@ -266,7 +266,7 @@ npm version patch
 npm publish --access public
 ```
 
-`npm version patch` bumps the version and also creates a git commit and tag. `npm publish` then asks for your 6-digit authenticator code; if you prefer to pass it inline, add `--otp=123456`, where `123456` is a placeholder for that code — note that inline values end up in your shell history.
+`npm version patch` bumps the version and also creates a git commit and tag. The working tree must be clean before running it, and every commit in this repository carries a `Reviewed-by: reviewer` trailer, so amend the bump commit (or make it by hand) to add the trailer before pushing. `npm publish` then asks for your 6-digit authenticator code; if you prefer to pass it inline, add `--otp=123456`, where `123456` is a placeholder for that code — note that inline values end up in your shell history.
 
 Alternatively, use a granular access token with "Bypass two-factor authentication" enabled:
 
