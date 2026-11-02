@@ -97,6 +97,13 @@ GLOBO_EMAIL='you@example.com' GLOBO_PASSWORD='your-password' node /absolute/path
 
 It prints nothing on success — it waits for JSON-RPC on stdin, and logs only to stderr.
 
+### Credential handling
+
+- The agent never needs your credentials. They are configuration the server reads at startup; the model only ever sees tool results, and no tool returns a credential. Never paste a password into a chat: it becomes part of the transcript and any logs, and cannot be unsent — only rotated.
+- Prefer `GLOBO_SESSION_COOKIE` where you can. It is scoped to one portal session, it expires or is revoked when you sign out, and the server then never performs a password login.
+- Keep literal values out of committed files. Claude Code expands `${GLOBO_PASSWORD}` inside `.mcp.json`, and OpenCode supports `{env:GLOBO_PASSWORD}`, so the secret can live in the environment. Claude Desktop does not expand variables, so its `claude_desktop_config.json` needs the literal value — and that file must never be committed.
+- These credentials grant full access to the account. The portal has no scopes and no OAuth, so there is no read-only key. One account per process. If a value is ever exposed, sign out / rotate it.
+
 ## Connect a client
 
 ### Claude Code
